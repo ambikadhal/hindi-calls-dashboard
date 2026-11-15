@@ -19,6 +19,11 @@ d=pd.concat([pd.read_excel(f,sheet_name='Calls') for f in files],ignore_index=Tr
 dt=pd.to_datetime(d['Call date (IST)'],format='%d %b %Y, %I:%M %p')
 d['date']=dt.dt.normalize(); d['hour']=dt.dt.hour
 d['code']=d['Referral code'].astype(str).str.upper().str.replace(r'^[^A-Z0-9]+','',regex=True)
+# tidy typos: trailing punctuation, and spaced codes like 'CRIT 32' -> 'CRIT32' when that is a code seen cleanly elsewhere
+d['code']=d.code.str.replace(r'[^A-Z0-9]+$','',regex=True)
+_ok=set(d.code[d.code.str.fullmatch(r'[A-Z0-9]{2,10}')])
+_sq=d.code.str.replace(r'[^A-Z0-9]','',regex=True)
+d['code']=d.code.where(d.code.str.fullmatch(r'[A-Z0-9]{2,10}')|~_sq.isin(_ok),_sq)
 def team(c):
     if c.startswith(('CR','JSSK','SB')): return 'CR'
     if c.startswith('OD'): return 'OD'
@@ -104,7 +109,7 @@ for T in TARGETS:
     r['need_mob']=float(r['goal'][-1]/max(r['cpm'],1))
     out['teams'][T]=r
 # code-wise rows (codes only)
-a=d[d.team!='UN']; c=a[a.hin].groupby(['code','date']).size().unstack(fill_value=0).reindex(columns=days,fill_value=0)
+a=d[d.team!='UN']; c=a[a.hin].groupby(['code','date']).size().unstack(fill_value=0).reindex(index=sorted(a.code.unique()),columns=days,fill_value=0)  # every code, even with zero Hindi calls
 tm=a.groupby('code').team.first(); al=a.groupby('code').size(); ay=a[a.date==days[-1]].groupby('code').size()
 out['codes']=[[k,tm[k],int(c.loc[k].sum()),int(al[k]),c.loc[k].tolist(),int(ay.get(k,0))] for k in c.sum(axis=1).sort_values(ascending=False).index]
 out['regTeam']={l:d[d.Language==l].groupby('team').size().to_dict() for l in REG}
