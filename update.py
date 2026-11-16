@@ -8,6 +8,7 @@ TNAME={'CR':'Craftzens','WB':'mDigital-ParisevaOne','OD':'mDigital-OD'}
 TOPN={'CR':25,'WB':15,'OD':10}
 SCOPE={'CR':['Telugu','Kannada','Marathi','Tamil','Punjabi','Gujarati','Malayalam'],'WB':['Bangla'],'OD':['Telugu']}
 TELSPLIT={'CR':2350,'OD':650}
+REGT={'Telugu':3000,'Bangla':3000,'Kannada':1500,'Marathi':1500,'Tamil':1500,'Punjabi':1500,'Gujarati':1500,'Malayalam':1500}  # company-wide regional language targets
 REG=['Telugu','Bangla','Kannada','Marathi','Tamil','Punjabi','Gujarati','Malayalam']
 HIN=['Hindi','Bhojpuri','Haryanvi']
 MILESTONE=False  # no interim milestone: one smooth plan to the target
@@ -78,7 +79,7 @@ chd=hs.groupby('date').size().reindex(days,fill_value=0).values
 out={'nomile':not MILESTONE,'days':lab,'dnum':[x.day for x in days],'LAST':LAST,'REM':REM,'milestone':MILE,'F':F,'mileDay':MILE_DAY,'peakDay':(MILE_DAY if (STRICT and LAST<MILE_DAY) else PEAK_DAY),'strict':bool(STRICT and LAST<MILE_DAY),
  'co':series(chd,hsum,TH,MILE)}
 out['co'].update(calls=len(d),odia=int((d.Language=='Odia').sum()),eng=int((d.Language=='English').sum()),
- reg={l:int((d.Language==l).sum()) for l in REG},unassigned=int(hs[hs.team=='UN'].shape[0]))
+ reg={l:int((d.Language==l).sum()) for l in REG},regt=REGT,unassigned=int(hs[hs.team=='UN'].shape[0]))
 out['teams']={}
 for T in TARGETS:
     S=d[d.team==T]; H=S[S.hin]
@@ -97,7 +98,7 @@ for T in TARGETS:
     LR=[]
     for l in SCOPE[T]:
         own=int((S.Language==l).sum()); comp=int((d.Language==l).sum())
-        tg=TELSPLIT[T] if l=='Telugu' else 1500; done=own if l=='Telugu' else comp
+        tg=TELSPLIT[T] if l=='Telugu' else REGT[l]; done=own if l=='Telugu' else comp
         src=S if l=='Telugu' else d
         dl=src[src.Language==l].groupby('date').size().reindex(days,fill_value=0).values.tolist()
         LR.append(dict(lang=l,target=tg,done=done,own=own,comp=comp,perday=max(tg-done,0)/REM,daily=dl))
