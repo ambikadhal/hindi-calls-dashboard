@@ -88,9 +88,10 @@ details.how{margin-top:10px}
  th,td{padding:7px 6px}
 }
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important}}
+.tile span b{display:inline;font-size:inherit;color:inherit}
 .dlb{border:0;background:var(--blue);color:#fff;border-radius:22px;padding:11px 22px;font:inherit;font-weight:600;cursor:pointer}.dlb:active{transform:scale(.97)}
 </style></head><body>
-<header><h1>Hindi call target tracker</h1><p id="hsub"></p></header>
+<header><h1>Call target tracker</h1><p id="hsub"></p></header>
 <nav id="nav"></nav><main id="main"></main>
 <footer>Team = referral-code prefix (CR/JSSK/SB = Craftzens · WB = ParisevaOne · OD = mDigital-OD). Hindi = Hindi + Bhojpuri + Haryanvi. Updated every morning with the previous day's calls.<br><a href="index.html" style="color:var(--blue)">← Field team page (find my count)</a></footer>
 <script>
@@ -141,60 +142,69 @@ const tlab=i=>dn(i+1);
 /* ---------- helpers ---------- */
 const ring=(p,c)=>{const r=40,C=2*Math.PI*r;return `<svg class="ring" viewBox="0 0 100 100"><circle cx="50" cy="50" r="${r}" fill="none" stroke="rgba(255,255,255,.25)" stroke-width="10"/><circle cx="50" cy="50" r="${r}" fill="none" stroke="#fff" stroke-width="10" stroke-linecap="round" stroke-dasharray="0 ${C}" data-d="${C*Math.min(p,1)} ${C}" transform="rotate(-90 50 50)"/><text x="50" y="56" text-anchor="middle" font-size="20" font-weight="800">${pc(p)}</text></svg>`};
 const bar=(p,mk)=>`<div class="bar"><i style="width:${Math.min(Math.max(p,0),1)*100}%"></i>${mk!=null?`<u style="left:${mk*100}%"></u>`:''}</div>`;
-function mileInfo(r,who){if(D.nomile)return '';const m=r.mile,done=r.hindi;let t='';
- if(LAST>=MD){const at=r.cumact[MD-1];t=at>=m.target?`<span class="chip ok">Milestone met on ${MD} Nov</span>`:`<span class="chip bad">${MD} Nov milestone missed by ${f(m.target-at)}</span>`}
- else{const per=m.need15,ratio=per/r.b7;t=`To hit it by ${MD} Nov EOD: <b>${f(per)}</b> calls/day (${ratio.toFixed(1)}× current pace). `+(m.cross?`The smooth plan crosses it on <b>${m.cross} Nov</b>.`:'')+(m.pace_cross?` At today's pace: ${m.pace_cross} Nov.`:' At today\'s pace: not by 30 Nov.')}
- return `<div class="card"><h2>🎯 Milestone: ${f(m.target)} by ${MD} Nov EOD ${who?'· '+who:''}</h2><p class="sub">${f(done)} done · ${f(Math.max(m.gap,0))} to go · ${pc(done/m.target)}</p>${bar(done/m.target)}<p style="margin:8px 0 0;font-size:13.5px">${t}</p></div>`}
-function planCharts(id,r,title){
- const hd=r.hd,a=pad(hd,0),g=pad(r.goal,LAST);
- const cumA=pad(r.cumact,0),conn=(arr)=>{const v=pad(arr,LAST);v[LAST-1]=r.cumact[LAST-1];return v};
- const sun=MONTH.filter(n=>isSun(n)).map(n=>n-1);
- return `<div class="card"><h2>${title||'Daily Hindi calls'}: done vs goal</h2><p class="sub">Dark bars = calls done. Light bars = daily goal for the days ahead. Orange columns are Sundays. Hover or tap for numbers.</p><div id="${id}-d"></div></div>
- <div class="card"><h2>Running total vs target</h2><p class="sub">Solid line = calls so far. Dashed = the plan. Tap a legend name to hide a line.</p><div id="${id}-c"></div></div>`
-}
-function planMount(id,r,col){
- const a=pad(r.hd,0),g=pad(r.goal,LAST),sun=MONTH.filter(n=>isSun(n)).map(n=>n-1);
- mount(id+'-d',{x:MONTH,tl:tlab,shade:sun,h:230,bars:[{n:'Calls done',c:col,v:a},{n:'Daily goal',c:col,o:.4,v:g}],vlines:[{i:PEAK-1,label:'peak reached',c:'var(--grn)'}]});
- const conn=arr=>{const v=pad(arr,LAST);v[LAST-1]=r.cumact[LAST-1];return v};
- mount(id+'-c',{x:MONTH,tl:tlab,h:250,lines:[{n:'Done so far',c:col,v:pad(r.cumact,0),w:3},{n:'Plan',c:'#16a34a',dash:1,v:conn(r.cum),w:2.6},{n:'If pace stays flat',c:'#8a94a8',dash:1,w:1.8,v:conn(r.flatpath)},{n:'If trend continues',c:'#b07cf0',dash:1,w:1.8,v:conn(r.trendpath)}],
-  hlines:[{v:r.target,label:'Target '+lk(r.target)}].concat(D.nomile?[]:[{v:r.mile.target,label:'Milestone '+lk(r.mile.target)+' by '+MD+' Nov',c:'#e5484d'}]),vlines:D.nomile?[]:[{i:MD-1,label:MD+' Nov',c:'#e5484d'}]});
-}
-function dayTable(r){return `<div class="tw"><table><tr><th>Day</th><th>Goal</th><th>Total by evening</th><th></th></tr>${r.goal.map((g,i)=>{const n=first+i,cl=[isSun(n)?'sun':'',i==0?'today':'',n==MD?'mile':''].join(' ');
- return `<tr class="${cl}"><td>${dn(n)}${i==0?' · today':''}</td><td>${f(g)}</td><td>${f(r.cum[i])}</td><td class="l" style="font-size:12px;color:var(--mut)">${isSun(n)?'Sunday: expect a dip, push harder':''}${n==MD&&!D.nomile?'🎯 milestone day':''}${n==PEAK?' peak pace reached':''}</td></tr>`}).join('')}</table></div>`}
-function ckptTable(r){const rows=Object.entries(r.ckpt),all=[15,20,25,30].map(n=>{const planV=n>=first?r.ckpt[n]:null;return n});
- // checkpoints: use plan for upcoming; for past days show actual
- const body=[15,20,25,30].map(n=>{if(n<=LAST){const v=r.cumact[n-1];return `<tr><td>${n} Nov</td><td>${f(v)}</td><td>–</td><td><span class="chip info">done</span></td></tr>`}
-  const p=r.ckpt[n],need=(p-r.hindi)/(n-LAST);return `<tr><td>${n} Nov</td><td>${f(p)}</td><td>${f(need)}/day</td><td><span class="chip warn">ahead</span></td></tr>`}).join('');
- return `<div class="tw"><table><tr><th>By end of</th><th>Total needed</th><th>Pace from now</th><th></th></tr>${body}</table></div>`}
+/* ---------- regional-first views: achieved and balance only ---------- */
+const REGL=Object.keys(D.co.reg);
+const left=(v,t)=>Math.max(t-v,0);
+const balTxt=(v,t)=>left(v,t)?`<b>${f(left(v,t))}</b> to go`:'✅ target achieved';
+const pctLeft=(v,t)=>left(v,t)/t;
+function langTile(l,v,t){return `<div class="tile"><b>${l}</b><div style="margin:6px 0">${bar(v/t)}</div><span>${f(v)} / ${f(t)} · ${balTxt(v,t)}</span></div>`}
+function othCard(o,note){const ks=Object.keys(o).sort((a,b)=>o[b]-o[a]);
+ return `<div class="card" style="margin-top:12px"><h2>Other languages · done till date</h2><p class="sub">No targets for these. ${note||''}</p><div class="grid g4">${ks.map(l=>`<div class="tile"><b>${f(o[l])}</b><span>${l}</span></div>`).join('')}</div></div>`}
+function hindiCard(r,who){return `<div class="card" style="margin-top:12px"><h2>Hindi calls · ${who}</h2><p class="sub">Hindi, Bhojpuri and Haryanvi together. Target ${f(r.target)} by 30 Nov.</p><div style="margin:6px 0 10px">${bar(r.hindi/r.target)}</div><div class="grid" style="grid-template-columns:repeat(2,1fr)"><div class="tile acc"><b>${f(r.hindi)}</b><span>achieved (${pc(r.hindi/r.target)})</span></div><div class="tile"><b>${f(left(r.hindi,r.target))}</b><span>balance</span></div></div></div>`}
+function codeRows(T){return D.codes.filter(c=>!T||c[1]==T).map(c=>({code:c[0],team:c[1],hindi:c[2],all:c[3],yall:c[5],reg:c[6],l:c[7],rd:c[8],yreg:c[8][c[8].length-1],last3:c[8].slice(-3).reduce((p,x)=>p+x,0),langs:Object.entries(c[7]).sort((a,b)=>b[1]-a[1])}))}
+function codeTip(r){const tl=D.teams[r.team].langs.map(x=>x.lang);
+ if(r.reg==0)return r.hindi>=30?`Strong on Hindi (${f(r.hindi)}) but no regional calls yet. Ask this referrer to also bring ${tl.slice(0,3).join(' / ')} speaking contacts.`:'No regional calls yet. Ask this referrer to bring regional-language contacts.';
+ if(r.last3==0)return `Made ${f(r.reg)} regional calls earlier but none in the last 3 days. Remind this referrer.`;
+ const miss=tl.find(l=>!(l in r.l));
+ return `Best regional language: ${r.langs[0][0]} (${f(r.langs[0][1])} calls).`+(miss?` Ask for ${miss} contacts too.`:'')}
+function teamTips(T){const r=D.teams[T],rows=codeRows(T),t=[],tr=rows.reduce((p,x)=>p+x.reg,0);
+ const lg=r.langs.filter(x=>x.done<x.target).sort((a,b)=>pctLeft(b.done,b.target)-pctLeft(a.done,a.target));
+ t.push(lg.length?['🎯','Focus languages',`${lg.slice(0,3).map(x=>x.lang+' ('+f(left(x.done,x.target))+' to go)').join(', ')}. Ask every caller to take these contacts first.`]:['🏆','All regional targets met','Keep the momentum going.']);
+ const top=rows.filter(x=>x.reg>0).sort((a,b)=>b.reg-a.reg);
+ if(top.length)t.push(['⭐','Learn from the top regional codes',`${top.slice(0,3).map(x=>x.code+' ('+f(x.reg)+')').join(', ')} give ${pc(top.slice(0,3).reduce((p,x)=>p+x.reg,0)/Math.max(tr,1))} of this team's regional calls. Ask what they do differently and share it with the others.`]);
+ lg.slice(0,2).forEach(x=>{const b=rows.filter(c=>c.l[x.lang]).sort((p,q)=>q.l[x.lang]-p.l[x.lang]);if(b.length)t.push(['🗣️',x.lang+' calls',`${b.length} code${b.length>1?'s have':' has'} made ${x.lang} calls so far. ${b[0].code} leads with ${f(b[0].l[x.lang])}. Ask more codes to reach ${x.lang}-speaking contacts.`])});
+ const hs=rows.filter(x=>x.reg==0&&x.hindi>=100).sort((a,b)=>b.hindi-a.hindi);
+ if(hs.length)t.push(['🔁','Hindi-strong codes with no regional calls',`${hs.length} code${hs.length>1?'s have':' has'} 100+ Hindi calls but no regional calls yet: ${hs.slice(0,5).map(x=>x.code).join(', ')}. Ask them to bring regional-language contacts too.`]);
+ const qu=rows.filter(x=>x.reg>=5&&x.last3==0).sort((a,b)=>b.reg-a.reg);
+ if(qu.length)t.push(['😴','Regional codes gone quiet',`${qu.slice(0,5).map(x=>x.code+' ('+f(x.reg)+')').join(', ')} made no regional calls in the last 3 days. Call their referrers today.`]);
+ const cs=Object.values(D.co.reg).reduce((p,x)=>p+x,0)/D.co.calls,ts=tr/r.calls;
+ t.push(['📊','Regional share of calls',`${pc(ts)} of ${r.name}'s calls are regional, against ${pc(cs)} company-wide.`+(ts<cs?' Try to lift it above the company level.':' Above the company level, keep it up.')]);
+ const rd=r.regd,y=rd[rd.length-1],b7=avg(rd.slice(-8,-1));
+ if(b7>0)t.push([y<b7*.8?'📉':'📈',y<b7*.8?'Regional calls dipped yesterday':'Regional calls held up yesterday',`${f(y)} regional calls yesterday against a usual ${f(b7)} a day over the week before.`]);
+ return t}
 /* ---------- code table (cards on phones, table on desktop) ---------- */
 function codeTable(host,rows,o){
  const mq=matchMedia('(max-width:700px)');
- const st={q:'',tf:'ALL',sf:'ALL',k:'hindi',d:-1,open:null,lim:30};
- const SORTS=[['hindi','Most Hindi calls'],['goal','Highest goal today'],['gap','Furthest behind goal'],['y','Yesterday'],['b3','3-day average'],['best','Best day'],['code','Code A–Z']];
- host.innerHTML=`<div class="flt${o.search?' stk':''}">${o.search?'<input class="q" type="search" placeholder="🔍 Search a code, e.g. CRNI" autocomplete="off">':''}<div class="row2">${o.teams?'<select class="tf"><option value="ALL">All teams</option>'+TK.map(t=>`<option value="${t}">${D.teams[t].name}</option>`).join('')+'</select>':''}<select class="so">${SORTS.map(s=>`<option value="${s[0]}">Sort: ${s[1]}</option>`).join('')}</select></div><div class="seg"></div></div><div class="meta"></div><div class="tw tbl"><table></table></div><div class="cl"></div><div class="mre"></div><details class="how"><summary>How goals are set</summary><p class="help">Goal today = the code's last-7-day average × the team's speed-up for today, and always at least 5% above that code's own best day so far. <b>On goal</b> = last 3 days average at or above goal · <b>Close</b> = at least 60% · <b>Behind</b> = below 60%. Tap a code for its daily chart.</p></details>`;
+ const st={q:'',tf:'ALL',sf:'ALL',k:'reg',d:-1,open:null,lim:30};
+ const SORTS=[['reg','Most regional calls'],['yreg','Regional yesterday'],['last3','Regional last 3 days'],['hindi','Most Hindi calls'],['all','Total calls'],['code','Code A–Z']];
+ const SEG=[['ALL','All'],['Y','With regional'],['N','No regional yet'],['Q','Quiet 3 days']];
+ host.innerHTML=`<div class="flt${o.search?' stk':''}">${o.search?'<input class="q" type="search" placeholder="🔍 Search a code, e.g. CRNI" autocomplete="off">':''}<div class="row2">${o.teams?'<select class="tf"><option value="ALL">All teams</option>'+TK.map(t=>`<option value="${t}">${D.teams[t].name}</option>`).join('')+'</select>':''}<select class="so">${SORTS.map(s=>`<option value="${s[0]}">Sort: ${s[1]}</option>`).join('')}</select></div><div class="seg"></div></div><div class="meta"></div><div class="tw tbl"><table></table></div><div class="cl"></div><div class="mre"></div>`;
  const $=s=>host.querySelector(s),tb=$('table'),cl=$('.cl'),seg=$('.seg'),meta=$('.meta'),mre=$('.mre'),so=$('.so');
- const cls=s=>s=='On goal'?'ok':s=='Close'?'warn':'bad';
- const card=r=>{const p=r.goal?r.b3/r.goal:0,op=st.open==r.code;
-  return `<div class="cc${op?' open':''}" data-c="${r.code}" style="--c:${COL[r.team]}"><div class="ct"><b class="code">${r.code}</b><span class="tm">${o.teams?D.teams[r.team].name.replace('mDigital-',''):''}</span><span class="chip ${cls(r.status)}">${r.status}</span></div>
-  <div class="pg">${bar(p)}<small>Recent pace <b>${f(r.b3)}</b>/day · ${pc(p)} of today's goal</small></div>
-  <div class="st4"><div><b>${r.y}</b><span>Yesterday</span></div><div><b>${r.best}</b><span>Best day</span></div><div><b>${f(r.hindi)}</b><span>Total</span></div><div class="g"><b>${f(r.goal)}</b><span>Goal today</span></div></div>
-  ${op?`<div class="cd"></div><div class="more2">Goal at peak: <b>${f(r.pk)}</b>/day</div>`:''}</div>`};
+ const sf=r=>st.sf=='ALL'||(st.sf=='Y'&&r.reg>0)||(st.sf=='N'&&r.reg==0)||(st.sf=='Q'&&r.reg>=5&&r.last3==0);
+ const lt=r=>r.langs.length?r.langs.slice(0,3).map(([l,v])=>l+' '+f(v)).join(' · '):'No regional calls yet';
+ const card=r=>{const op=st.open==r.code;
+  return `<div class="cc${op?' open':''}" data-c="${r.code}" style="--c:${COL[r.team]}"><div class="ct"><b class="code">${r.code}</b><span class="tm">${o.teams?D.teams[r.team].name.replace('mDigital-',''):''}</span></div>
+  <div class="pg"><small>${lt(r)}</small></div>
+  <div class="st4"><div class="g"><b>${f(r.reg)}</b><span>Regional</span></div><div><b>${r.yreg}</b><span>Yest. regional</span></div><div><b>${f(r.hindi)}</b><span>Hindi</span></div><div><b>${f(r.all)}</b><span>Total</span></div></div>
+  ${op?`<div class="cd"></div><div class="more2">${codeTip(r)}</div>`:''}</div>`};
  const draw=()=>{if(!host.isConnected)return;const M=mq.matches;
   const base=rows.filter(r=>(!st.q||r.code.includes(st.q))&&(st.tf=='ALL'||r.team==st.tf));
-  const cnt={ALL:base.length};base.forEach(r=>cnt[r.status]=(cnt[r.status]||0)+1);
-  const rs=base.filter(r=>st.sf=='ALL'||r.status==st.sf);
+  const rs=base.filter(sf);
   rs.sort((a,b)=>(a[st.k]>b[st.k]?1:a[st.k]<b[st.k]?-1:0)*st.d);
-  seg.innerHTML=['ALL','On goal','Close','Behind'].map(s=>`<button data-s="${s}" class="${st.sf==s?'on':''}">${s=='ALL'?'All':s}<em>${cnt[s]||0}</em></button>`).join('');
-  meta.textContent=`${rs.length} code${rs.length==1?'':'s'}`+(st.q?` matching "${st.q}"`:'');so.value=SORTS.some(s=>s[0]==st.k)?st.k:'hindi';
+  const cnt=k=>{const s0=st.sf;st.sf=k;const n=base.filter(sf).length;st.sf=s0;return n};
+  seg.innerHTML=SEG.map(s=>`<button data-s="${s[0]}" class="${st.sf==s[0]?'on':''}">${s[1]}<em>${cnt(s[0])}</em></button>`).join('');
+  meta.textContent=`${rs.length} code${rs.length==1?'':'s'}`+(st.q?` matching "${st.q}"`:'');so.value=SORTS.some(s=>s[0]==st.k)?st.k:'reg';
+  const chart=(el,r,h)=>mkChart(el,{x:D.dnum,tl:i=>D.days[i],h,bars:[{n:r.code+' regional calls',c:COL[r.team],v:r.rd}]});
   if(M){tb.innerHTML='';cl.innerHTML=rs.length?rs.slice(0,st.lim).map(card).join(''):'<div class="help">No codes match. Try another filter.</div>';
    mre.innerHTML=rs.length>st.lim?`<button>Show ${Math.min(30,rs.length-st.lim)} more · ${rs.length-st.lim} left</button>`:'';
-   if(st.open){const r=rows.find(x=>x.code==st.open),el=cl.querySelector('.cc.open .cd');if(r&&el)mkChart(el,{x:D.dnum,tl:i=>D.days[i],h:160,bars:[{n:r.code+' Hindi calls',c:COL[r.team],v:r.daily}],hlines:[{v:r.goal,label:'goal '+f(r.goal)}]})}}
-  else{cl.innerHTML='';mre.innerHTML='';const cols=[['code','Code'],['team','Team'],['hindi','Hindi total'],['y','Yesterday'],['b3','3-day avg'],['best','Best day'],['goal','Goal today'],['pk','Goal at peak'],['status','Status']];
-   tb.innerHTML=`<tr>${cols.filter(c=>o.teams||c[0]!='team').map(c=>`<th class="s" data-k="${c[0]}">${c[1]}${st.k==c[0]?(st.d<0?' ▼':' ▲'):''}</th>`).join('')}<th>Progress</th></tr>`+rs.slice(0,300).map(r=>{const p=r.goal?r.b3/r.goal:0;
-    return `<tr class="row" data-c="${r.code}"><td><b>${r.code}</b></td>${o.teams?`<td class="l">${D.teams[r.team].name.replace('mDigital-','')}</td>`:''}<td>${f(r.hindi)}</td><td>${r.y}</td><td>${f(r.b3)}</td><td>${r.best}</td><td><b>${f(r.goal)}</b></td><td>${f(r.pk)}</td><td><span class="chip ${cls(r.status)}">${r.status}</span></td><td style="min-width:90px">${bar(p)}</td></tr>`+(st.open==r.code?`<tr><td colspan="10" style="padding:10px 4px"><div id="cd"></div></td></tr>`:'')}).join('')+(rs.length>300?`<tr><td colspan="10" class="l">Showing first 300 of ${rs.length}. Use search.</td></tr>`:'');
+   if(st.open){const r=rows.find(x=>x.code==st.open),el=cl.querySelector('.cc.open .cd');if(r&&el)chart(el,r,160)}}
+  else{cl.innerHTML='';mre.innerHTML='';const cols=[['code','Code'],['team','Team'],['reg','Regional calls'],['yreg','Regional yesterday'],['last3','Regional last 3 days'],['hindi','Hindi calls'],['all','Total calls']].filter(c=>o.teams||c[0]!='team');
+   tb.innerHTML=`<tr>${cols.map(c=>`<th class="s" data-k="${c[0]}">${c[1]}${st.k==c[0]?(st.d<0?' ▼':' ▲'):''}</th>`).join('')}<th>Regional languages</th></tr>`+rs.slice(0,300).map(r=>{
+    const row=`<tr class="row" data-c="${r.code}"><td><b>${r.code}</b></td>${o.teams?`<td class="l">${D.teams[r.team].name.replace('mDigital-','')}</td>`:''}<td><b>${f(r.reg)}</b></td><td>${r.yreg}</td><td>${r.last3}</td><td>${f(r.hindi)}</td><td>${f(r.all)}</td><td class="l" style="font-size:12.5px">${lt(r)}</td></tr>`;
+    return row+(st.open==r.code?`<tr><td colspan="${cols.length+1}"><div id="cd"></div><div class="more2" style="margin-top:6px">${codeTip(r)}</div></td></tr>`:'')}).join('');
    tb.querySelectorAll('th.s').forEach(th=>th.onclick=()=>{const k=th.dataset.k;st.d=st.k==k?-st.d:(k=='code'||k=='team'?1:-1);st.k=k;draw()});
    tb.querySelectorAll('tr.row').forEach(tr=>tr.onclick=()=>{st.open=st.open==tr.dataset.c?null:tr.dataset.c;draw()});
-   if(st.open){const r=rows.find(x=>x.code==st.open);if(r&&tb.querySelector('#cd'))mkChart(tb.querySelector('#cd'),{x:D.dnum,tl:i=>D.days[i],h:150,bars:[{n:r.code+' Hindi calls',c:COL[r.team],v:r.daily}],hlines:[{v:r.goal,label:'goal today '+f(r.goal)}]})}}};
+   if(st.open){const r=rows.find(x=>x.code==st.open);if(r&&tb.querySelector('#cd'))chart(tb.querySelector('#cd'),r,150)}}};
  cl.onclick=e=>{const c=e.target.closest('.cc');if(!c||e.target.closest('.cd'))return;st.open=st.open==c.dataset.c?null:c.dataset.c;draw()};
  mre.onclick=e=>{if(e.target.closest('button')){st.lim+=30;draw()}};
  seg.onclick=e=>{const b=e.target.closest('button');if(b){st.sf=b.dataset.s;st.lim=30;draw()}};
@@ -202,61 +212,46 @@ function codeTable(host,rows,o){
  const q=$('.q');if(q)q.oninput=e=>{st.q=e.target.value.toUpperCase().trim();st.lim=30;draw()};const tf=$('.tf');if(tf)tf.onchange=e=>{st.tf=e.target.value;st.lim=30;draw()};
  mq.addEventListener('change',draw);draw();fxBars(host);
 }
-function mkRows(src,T){const r=D.teams[T],ratio=r.goal[0]/r.b7,pr=r.peak/r.b7;
- return src.map(x=>{const b7=avg(x.daily.slice(-7)),b3=avg(x.daily.slice(-3)),best=Math.max(...x.daily),g0=b7*ratio,g=best>0?Math.max(g0,Math.ceil(best*1.05)):g0;return {code:x.code,team:T,hindi:x.hindi,daily:x.daily,y:x.daily[x.daily.length-1],b3,best,goal:g,gap:g-b3,pk:Math.max(b7*pr,g0?g*pr/ratio:0),status:g==0?'Behind':b3>=g?'On goal':b3>=.6*g?'Close':'Behind'}})}
 /* ---------- pages ---------- */
-function regCard(c){const R=c.regt,ks=Object.keys(c.reg).sort((a,b)=>(R[b]-c.reg[b])/R[b]-(R[a]-c.reg[a])/R[a]);
- const tot=ks.reduce((p,l)=>p+R[l],0),dn_=ks.reduce((p,l)=>p+Math.min(c.reg[l],R[l]),0),left=tot-dn_;
- let h=`<div class="card hero" style="border-left:5px solid var(--org)">${ring(dn_/tot)}<div class="txt"><small>🎯 Main focus now · Regional languages</small><div class="big">${f(left/REM)}</div><small>regional calls needed every day until 30 Nov (${f(left)} still to go of ${f(tot)}). ${c.flat>=c.target?'Hindi is on pace to reach its target at the current speed, so extra effort should go into regional languages.':'Hindi still needs its daily goal too.'}</small></div></div>
- <div class="card" style="margin-top:12px"><h2>Regional language targets</h2><p class="sub">Company-wide count against each target (Telugu 3,000 · Bangla 3,000 · others 1,500). Furthest from target first. Odia (${f(c.odia)}) already achieved; English (${f(c.eng)}) not counted.</p><div class="grid g4">`;
- ks.forEach(l=>{const v=c.reg[l],tg=R[l],lf=Math.max(tg-v,0);h+=`<div class="tile"><b>${l}</b><div style="margin:6px 0">${bar(v/tg)}</div><span>${f(v)} / ${f(tg)} · needs <b>${f(lf/REM)}</b>/day</span></div>`});
- return h+`</div></div>`}
-function overview(){const c=D.co,pcnt=c.hindi/c.target,rise=(c.peak-c.s0)/Math.max(PEAK-first,1);
- let h=regCard(c)+`<div class="card hero" style="margin-top:12px">${ring(pcnt)}<div class="txt"><small>Company goal today · ${dn(first)}</small><div class="big">${f(c.goal[0])}</div><small>Hindi calls · yesterday we did <b>${f(c.yest)}</b>. ${rise>1?`Goal rises about ${f(rise)} a day until ${PEAK} Nov (to ~${f(c.peak)}), then ${D.strict?'eases to about '+f(c.goal[c.goal.length-1])+' a day':'stays almost flat'}.`:`Goal stays at about ${f(c.goal[0])} a day until 30 Nov.`}</small></div></div>
- <div class="grid g4" style="margin-top:12px"><div class="tile acc"><b>${f(c.hindi)}</b><span>Hindi calls done of ${f(c.target)}</span></div><div class="tile"><b>${f(c.remaining)}</b><span>still to do in ${REM} days</span></div><div class="tile"><b>${f(c.b7)}</b><span>last-7-day average per day</span></div><div class="tile"><b>${f(c.peak/c.b7*10)/10}×</b><span>speed-up needed by ${PEAK} Nov</span></div></div>
- <div style="margin-top:12px">${mileInfo(c,'Company')}</div>
- <h2 style="margin:18px 2px 8px;font-size:17px">Teams <span style="font-weight:400;font-size:13px;color:var(--mut)">· tap a card to open</span></h2><div class="grid g3">`;
- TK.forEach(t=>{const r=D.teams[t];h+=`<div class="card tcard" style="--c:${COL[t]}" onclick="go('${t}')"><b style="font-size:16px">${r.name}</b><div style="margin:8px 0 6px">${bar(r.hindi/r.target,D.nomile?null:r.mile.target/r.target)}</div><div style="font-size:13.5px">${f(r.hindi)} / ${f(r.target)} (${pc(r.hindi/r.target)})${D.nomile?'':` · <span style="color:var(--org)">▮</span> milestone ${lk(r.mile.target)}`}</div><div class="grid" style="grid-template-columns:1fr 1fr;margin-top:10px"><div><span class="sub" style="margin:0">Goal today</span><br><b style="font-size:20px">${f(r.goal[0])}</b></div><div><span class="sub" style="margin:0">Yesterday</span><br><b style="font-size:20px">${f(r.yest)}</b></div></div></div>`});
- h+=`</div><div class="grid g2" style="margin-top:12px"><div class="card"><h2>Daily Hindi calls by team</h2><p class="sub">Hover or tap for numbers. Tap a team name to hide it.</p><div id="o-t"></div></div><div class="card"><h2>Company running total</h2><p class="sub">${D.nomile?'':`Orange line = ${f(MILE)} milestone by ${MD} Nov. `}Top line = ${f(c.target)} target.</p><div id="o-c"></div></div></div>`;
- h+=`<details class="card"><summary>How the daily goal is worked out</summary><p class="help">Goal starts above yesterday's level (the last few days were low because of Diwali, so today's goal is set higher to get back on track), ${D.strict?`is sized so the ${f(MILE)}-call milestone is reached by the end of ${MD} Nov (goals rise a little each day until then). After ${MD} Nov the rest is spread almost flat (+0.4% a day) so the target is still reached on 30 Nov.`:`rises evenly each day until ${PEAK} Nov, then stays almost flat (+0.4% a day) so the target is still reached on 30 Nov.`} If a day or checkpoint is missed, tomorrow's numbers go up automatically. ${f(c.unassigned)} Hindi calls have referral codes that match no team; they count only in company totals. Team targets add up to the company target.</p></details>`;
+function overview(){const c=D.co,R=c.regt,ks=REGL.slice().sort((a,b)=>pctLeft(c.reg[b],R[b])-pctLeft(c.reg[a],R[a]));
+ const tot=ks.reduce((p,l)=>p+R[l],0),dn_=ks.reduce((p,l)=>p+Math.min(c.reg[l],R[l]),0);
+ let h=`<div class="card hero" style="border-left:5px solid var(--org)">${ring(dn_/tot)}<div class="txt"><small>🎯 Main focus · Regional languages</small><div class="big">${f(tot-dn_)}</div><small>regional calls still to go · ${f(dn_)} done of ${f(tot)} (${pc(dn_/tot)})</small></div></div>
+ <div class="card" style="margin-top:12px"><h2>Regional languages</h2><p class="sub">Done against each target. Furthest from target first.</p><div class="grid g4">${ks.map(l=>langTile(l,c.reg[l],R[l])).join('')}</div></div>`;
+ h+=othCard(c.oth,'Bhojpuri and Haryanvi are also counted inside the Hindi total below.');
+ h+=hindiCard(c,'company');
+ h+=`<h2 style="margin:18px 2px 8px;font-size:17px">Teams <span style="font-weight:400;font-size:13px;color:var(--mut)">· tap a card to open</span></h2><div class="grid g3">`;
+ TK.forEach(t=>{const r=D.teams[t],rg=r.regd.reduce((p,x)=>p+x,0);h+=`<div class="card tcard" style="--c:${COL[t]}" onclick="go('${t}')"><b style="font-size:16px">${r.name}</b><div class="grid" style="grid-template-columns:1fr 1fr;margin-top:10px"><div><span class="sub" style="margin:0">Regional calls</span><br><b style="font-size:20px">${f(rg)}</b></div><div><span class="sub" style="margin:0">Yesterday</span><br><b style="font-size:20px">${f(r.regd[r.regd.length-1])}</b></div></div><div style="margin:10px 0 6px">${bar(r.hindi/r.target)}</div><div style="font-size:13.5px">Hindi: ${f(r.hindi)} / ${f(r.target)} · ${f(left(r.hindi,r.target))} balance</div></div>`});
+ h+=`</div><div class="card" style="margin-top:12px"><h2>Daily regional calls</h2><p class="sub">All regional languages, whole company. Hover or tap for numbers.</p><div id="o-r"></div></div>
+ <div class="grid g2" style="margin-top:12px"><div class="card"><h2>Daily Hindi calls by team</h2><p class="sub">Hover or tap for numbers. Tap a team name to hide it.</p><div id="o-t"></div></div><div class="card"><h2>Hindi running total</h2><p class="sub">Line = calls so far. Top line = ${f(c.target)} target.</p><div id="o-c"></div></div></div>
+ <details class="card"><summary>How to read this</summary><p class="help">Regional languages = Telugu, Bangla, Kannada, Marathi, Tamil, Punjabi, Gujarati and Malayalam, counted company-wide against their targets. Hindi = Hindi + Bhojpuri + Haryanvi. Team = referral-code prefix (CR/JSSK/SB = Craftzens · WB = ParisevaOne · OD = mDigital-OD). ${f(c.unassigned)} Hindi calls have referral codes that match no team; they count only in company totals.</p></details>`;
  return h}
 function mount_overview(){const c=D.co;
+ mount('o-r',{x:MONTH.slice(0,N),tl:tlab,h:200,bars:[{n:'Regional calls',c:'#f08a24',v:c.regd}]});
  mount('o-t',{x:MONTH.slice(0,N),tl:tlab,h:240,lines:TK.map(t=>({n:D.teams[t].name,c:COL[t],v:D.teams[t].hd,dots:1}))});
- const conn=arr=>{const v=pad(arr,LAST);v[LAST-1]=c.cumact[LAST-1];return v};
- mount('o-c',{x:MONTH,tl:tlab,h:240,lines:[{n:'Done so far',c:'#2f6fed',w:3,v:pad(c.cumact,0)},{n:'Plan',c:'#16a34a',dash:1,v:conn(c.cum)},{n:'If pace stays flat',c:'#8a94a8',dash:1,w:1.8,v:conn(c.flatpath)},{n:'If trend continues',c:'#b07cf0',dash:1,w:1.8,v:conn(c.trendpath)}],hlines:[{v:c.target,label:'Target '+lk(c.target),c:'#16a34a'}].concat(D.nomile?[]:[{v:MILE,label:'1L by '+MD+' Nov'}]),vlines:D.nomile?[]:[{i:MD-1,label:MD+' Nov',c:'#e5484d'}]})}
-function team(T){const r=D.teams[T],pcnt=r.hindi/r.target,col=COL[T],rise=(r.peak-r.s0)/Math.max(PEAK-first,1),ha=r.hourAvg;
- const eve=avg(ha.slice(15,23)),morn=avg(ha.slice(7,11)),late=ha[23];
- const lg=r.langs.filter(x=>x.done<x.target).sort((a,b)=>b.perday-a.perday);
- const act=[['Push regional languages',lg.length?`Regional calls are the main focus now: ${lg.slice(0,3).map(x=>x.lang+' needs '+f(x.perday)+'/day').join(', ')}. Ask every caller to take regional-language contacts first.`:'All regional language targets for this team are met. Keep going.'],['Set today\'s goal',`${r.name} needs <b>${f(r.goal[0])}</b> Hindi calls today (yesterday ${f(r.yest)}). ${rise>1?`Goal rises ~${f(rise)}/day until ${PEAK} Nov, to ~${f(r.peak)}/day.`:`Goal stays at about ${f(r.goal[0])}/day until 30 Nov.`}`],
- [D.nomile?'Reach the target':'Hit the milestone',D.nomile?`${f(r.remaining)} Hindi calls to go in ${REM} days: ${f(r.req)}/day on average. Each day above the goal lowers tomorrow's goal.`:LAST<MD?`${f(r.mile.target)} by ${MD} Nov EOD needs ${f(r.mile.need15)}/day. Plan crosses it on ${r.mile.cross||'after 30'} Nov; every extra call before ${MD} Nov brings it closer.`:`Milestone ${MD} Nov: ${r.cumact[MD-1]>=r.mile.target?'met':'missed'}.`],
- ['Fix Sundays',`Sundays (${MONTH.filter(n=>n>LAST&&isSun(n)).join(', ')} Nov) usually dip. Plan extra callers on those days.`],
- ['Use the mornings',`7–10 am averages only ${f(morn)}/hour vs ${f(eve)}/hour in the 3–10 pm window (${pc(morn/Math.max(eve,1))}). Start calling earlier.`],
- ['Wake up quiet codes',r.dormant.length?`${r.dormant.slice(0,4).map(x=>x.code).join(', ')} made no Hindi calls in the last 3 days. Call their referrers today.`:'No code has gone quiet. Keep it that way.'],
- ['Stop the slide',r.fall.length?`Falling codes: ${r.fall.slice(0,4).map(x=>x.code+' ('+f(x.a)+'→'+f(x.b)+'/day)').join(', ')}. Find out what changed.`:'No big code is falling.'],
- ['Add calling numbers',`About ${f(r.b7mob)} numbers call daily (~${r.cpm.toFixed(1)} Hindi calls each). At that rate the ${PEAK} Nov goal needs about ${f(r.need_mob)} numbers a day. Recruit more and raise calls per number.`],
- ['Protect the top codes',`Top 5 codes give ${pc(r.top5share)} of Hindi calls. Check them first every morning.`]];
- let h=`<div class="card" style="border-left:5px solid var(--org)"><h2>🎯 Regional language targets (main focus)</h2><p class="sub">Tap a language to see its day-by-day counts. Counts are all calls in that language${r.langs.some(x=>x.lang=='Telugu')?' (Telugu: this team only)':''}.</p><div class="grid g3 langs" style="margin-top:8px">${r.langs.map((x,i)=>`<details class="tile lang" data-i="${i}"><summary><b>${x.lang}</b><div style="margin:6px 0">${bar(x.done/x.target)}</div><span>${f(x.done)} / ${f(x.target)} · needs <b>${f(x.perday)}</b>/day</span><em class="hint">Tap for daily counts ▾</em></summary><div class="ld"></div></details>`).join('')}</div></div><div class="card hero" style="margin-top:12px">${ring(pcnt)}<div class="txt"><small>${r.name} · goal today · ${dn(first)}</small><div class="big">${f(r.goal[0])}</div><small>Hindi calls · yesterday ${f(r.yest)} · ${rise>1?`rises ~${f(rise)}/day to ~${f(r.peak)} by ${PEAK} Nov, then ${D.strict?'eases to ~'+f(r.goal[r.goal.length-1])+'/day':'almost flat'}.`:`stays at about ${f(r.goal[0])}/day until 30 Nov.`}</small></div></div>
- <div class="grid g4" style="margin-top:12px"><div class="tile acc"><b>${f(r.hindi)}</b><span>done of ${f(r.target)} (${pc(pcnt)})</span></div><div class="tile"><b>${f(r.remaining)}</b><span>still to do</span></div><div class="tile"><b>${f(r.b7)}</b><span>last-7-day average</span></div><div class="tile"><b>${f(r.flat)}</b><span>finish if pace stays flat (${pc(r.flat/r.target)})</span></div><div class="tile"><b>${f(r.trend)}</b><span>finish if trend continues (${pc(r.trend/r.target)})</span></div></div>
- <div style="margin-top:12px">${mileInfo(r)}</div><div class="grid g2" style="margin-top:12px">${planCharts('t',r)}</div>
- <div class="grid g2" style="margin-top:12px"><div class="card"><h2>Checkpoints</h2><p class="sub">Total Hindi calls needed by the end of each day.</p>${ckptTable(r)}</div><div class="card"><h2>Day-by-day goal</h2><p class="sub">Orange rows are Sundays.</p>${dayTable(r)}</div></div>
+ mount('o-c',{x:MONTH,tl:tlab,h:240,lines:[{n:'Done so far',c:'#2f6fed',w:3,v:pad(c.cumact,0)}],hlines:[{v:c.target,label:'Target '+lk(c.target),c:'#16a34a'}]})}
+function team(T){const r=D.teams[T],col=COL[T],tips=teamTips(T);
+ let h=`<div class="card" style="border-left:5px solid var(--org)"><h2>🎯 Regional languages · ${r.name}</h2><p class="sub">Tap a language to see its day-by-day counts. Counts are all calls in that language${r.langs.some(x=>x.lang=='Telugu')?' (Telugu: this team only)':''}.</p><div class="grid g3 langs" style="margin-top:8px">${r.langs.map((x,i)=>`<details class="tile lang" data-i="${i}"><summary><b>${x.lang}</b><div style="margin:6px 0">${bar(x.done/x.target)}</div><span>${f(x.done)} / ${f(x.target)} · ${balTxt(x.done,x.target)}</span><em class="hint">Tap for daily counts ▾</em></summary><div class="ld"></div></details>`).join('')}</div></div>`;
+ h+=othCard(r.oth,'');
+ h+=hindiCard(r,r.name);
+ h+=`<div class="card" style="margin-top:12px"><h2>💡 Tips to increase regional calls</h2><p class="sub">Based on this team's own codes</p><div class="acts" style="margin-top:8px">${tips.map((a,i)=>`<div class="act"><div class="n">${i+1}</div><div><b>${a[0]} ${a[1]}</b><span>${a[2]}</span></div></div>`).join('')}</div></div>
+ <div class="grid g2" style="margin-top:12px"><div class="card"><h2>Daily regional calls</h2><p class="sub">All regional languages, ${r.name}. Orange columns are Sundays.</p><div id="t-r"></div></div><div class="card"><h2>Hindi running total</h2><p class="sub">Line = calls so far. Top line = ${f(r.target)} target.</p><div id="t-c"></div></div></div>
  <div class="card" style="margin-top:12px"><h2>📥 Yesterday's sheet</h2><p class="sub">Every ${r.name} code with its total call count for ${D.days[N-1]}, as one image to share.</p><button class="dlb" onclick="dlSheet('${T}',this)">⬇ Download image</button></div>
- <div class="card" style="margin-top:12px"><h2>Referral codes: top ${r.topn}</h2><p class="sub">${r.ncodes} active codes. Compare each code with its goal for today.</p><div id="ct"></div></div>`;
- if(r.dormant.length)h+=`<div class="card" style="margin-top:12px"><h2>😴 Quiet codes</h2><p class="sub">Were active earlier but no Hindi calls in the last 3 days.</p><div class="tw"><table><tr><th>Code</th><th>Calls before</th><th>Last Hindi call</th></tr>${r.dormant.map(x=>`<tr><td><b>${x.code}</b></td><td>${f(x.calls)}</td><td>${x.last}</td></tr>`).join('')}</table></div></div>`;
- if(r.rise.length||r.fall.length)h+=`<div class="grid g2" style="margin-top:12px"><div class="card"><h2>📈 Rising codes</h2><p class="sub">Calls per day: first 5 days → last 5 days</p>${r.rise.map(x=>`<div style="padding:5px 0;border-bottom:1px solid var(--line)"><b>${x.code}</b> <span class="chip ok">${f(x.a)} → ${f(x.b)}</span></div>`).join('')||'None'}</div><div class="card"><h2>📉 Falling codes</h2><p class="sub">Calls per day: first 5 days → last 5 days</p>${r.fall.map(x=>`<div style="padding:5px 0;border-bottom:1px solid var(--line)"><b>${x.code}</b> <span class="chip bad">${f(x.a)} → ${f(x.b)}</span></div>`).join('')||'None'}</div></div>`;
- h+=`<div class="grid g2" style="margin-top:12px"><div class="card"><h2>⏰ When calls happen</h2><p class="sub">Average Hindi calls in each hour of the day.</p><div id="th"></div></div><div class="card"><h2>Day × hour map</h2><p class="sub">Darker = more calls. Hover for numbers.</p><div class="heat" id="hm"></div></div></div>
- <div class="card" style="margin-top:12px"><h2>✅ What to do today</h2><div class="acts" style="margin-top:8px">${act.map((a,i)=>`<div class="act"><div class="n">${i+1}</div><div><b>${a[0]}</b><span>${a[1]}</span></div></div>`).join('')}</div></div>`;
+ <div class="card" style="margin-top:12px"><h2>Referral codes</h2><p class="sub">Every ${r.name} code, most regional calls first. Tap a code for its daily chart and a tip.</p><div id="ct"></div></div>
+ <div class="grid g2" style="margin-top:12px"><div class="card"><h2>⏰ When calls happen</h2><p class="sub">Average Hindi calls in each hour of the day.</p><div id="th"></div></div><div class="card"><h2>Day × hour map</h2><p class="sub">Darker = more calls. Hover for numbers.</p><div class="heat" id="hm"></div></div></div>`;
  return h}
-function mount_team(T){const r=D.teams[T],col=COL[T];planMount('t',r,col);
- codeTable(document.getElementById('ct'),mkRows(r.top,T),{});
+function mount_team(T){const r=D.teams[T],col=COL[T];
+ mount('t-r',{x:MONTH.slice(0,N),tl:tlab,shade:MONTH.slice(0,N).map((n,i)=>isSun(n)?i:-1).filter(i=>i>=0),h:210,bars:[{n:'Regional calls',c:col,v:r.regd}]});
+ mount('t-c',{x:MONTH,tl:tlab,h:210,lines:[{n:'Done so far',c:col,w:3,v:pad(r.cumact,0)}],hlines:[{v:r.target,label:'Target '+lk(r.target)}]});
+ codeTable(document.getElementById('ct'),codeRows(T),{});
  document.querySelectorAll('details.lang').forEach(el=>el.addEventListener('toggle',()=>{if(!el.open||el.dataset.done)return;el.dataset.done=1;const x=r.langs[+el.dataset.i],box=el.querySelector('.ld'),dl=x.daily,tot=dl.reduce((p,c)=>p+c,0);
   const days=dl.map((v,i)=>[i,v]).reverse();
   box.innerHTML=`<div class="lchart"></div><div class="lsum"><div><b>${f(tot)}</b><span>total</span></div><div><b>${f(dl[dl.length-1])}</b><span>yesterday</span></div><div><b>${f(Math.max(...dl))}</b><span>best day</span></div><div><b>${f(avg(dl.slice(-7)))}</b><span>7-day avg</span></div></div><div class="tw"><table><tr><th>Day</th><th>Calls</th><th>Total so far</th></tr>${days.map(([i,v])=>`<tr class="${isSun(D.dnum[i])?'sun':''}"><td>${D.days[i]}</td><td><b>${f(v)}</b></td><td>${f(dl.slice(0,i+1).reduce((p,c)=>p+c,0))}</td></tr>`).join('')}</table></div>`;
-  mkChart(box.querySelector('.lchart'),{x:D.dnum,tl:i=>D.days[i],h:170,shade:D.dnum.map((n,i)=>isSun(n)?i:-1).filter(i=>i>=0),bars:[{n:x.lang+' calls',c:col,v:dl}],hlines:[{v:x.perday,label:'needs '+f(x.perday)+'/day'}]})}));
+  mkChart(box.querySelector('.lchart'),{x:D.dnum,tl:i=>D.days[i],h:170,shade:D.dnum.map((n,i)=>isSun(n)?i:-1).filter(i=>i>=0),bars:[{n:x.lang+' calls',c:col,v:dl}]})}));
  mount('th',{x:Array.from({length:24},(_,i)=>i),tl:i=>i+':00–'+(i+1)+':00',h:200,bars:[{n:'Avg Hindi calls',c:col,v:r.hourAvg}],fmt:v=>f(v)});
  const mx=Math.max(...r.heat.flat(),1);let s='<div></div>'+Array.from({length:24},(_,i)=>`<div class="h">${i%3==0?i:''}</div>`).join('');
  r.heat.forEach((row,d)=>{s+=`<div class="r">${D.days[d].split(' ').slice(0,2).join(' ')}</div>`+row.map((v,h)=>`<div title="${D.days[d]} ${h}:00 → ${v} calls" style="background:${col};opacity:${.07+.93*v/mx}"></div>`).join('')});document.getElementById('hm').innerHTML=s}
-function codesPage(){return `<div class="card"><h2>All referral codes (${D.codes.length})</h2><p class="sub">Every code with Hindi calls, all three teams. Search, filter, sort, and tap a row.</p><div id="ca"></div></div>`}
-function mount_codes(){const rows=D.codes.flatMap(c=>mkRows([{code:c[0],hindi:c[2],daily:c[4]}],c[1]));codeTable(document.getElementById('ca'),rows,{search:1,teams:1})}
+function codesPage(){return `<div class="card"><h2>All referral codes (${D.codes.length})</h2><p class="sub">Every code with calls, all three teams. Most regional calls first. Search, filter, sort, and tap a row.</p><div id="ca"></div></div>`}
+function mount_codes(){codeTable(document.getElementById('ca'),codeRows(),{search:1,teams:1})}
 /* ---------- yesterday's sheet as an image ---------- */
 function dlSheet(T,btn){const r=D.teams[T],rows=D.codes.filter(c=>c[1]==T&&c[5]>0).map(c=>[c[0],c[5],c[4][N-1]]).sort((a,b)=>b[1]-a[1]||b[2]-a[2]||(a[0]>b[0]?1:-1)),tot=rows.reduce((s,x)=>s+x[1],0);
  const PER=40,cols=Math.max(1,Math.ceil(rows.length/PER)),RH=34,CW=300,P=24,HD=96,W=Math.max(cols*CW+P*2,560),H=HD+Math.min(rows.length,PER)*RH+P+34,S=2;

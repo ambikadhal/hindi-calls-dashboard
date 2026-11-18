@@ -7,8 +7,8 @@ TH=150000; TEAM_BASE=240000; MILE=100000; MILE_DAY=15; PEAK_DAY=20; E=0.004  # T
 TNAME={'CR':'Craftzens','WB':'mDigital-ParisevaOne','OD':'mDigital-OD'}
 TOPN={'CR':25,'WB':15,'OD':10}
 SCOPE={'CR':['Telugu','Kannada','Marathi','Tamil','Punjabi','Gujarati','Malayalam'],'WB':['Bangla'],'OD':['Telugu']}
-TELSPLIT={'CR':2350,'OD':650}
-REGT={'Telugu':3000,'Bangla':3000,'Kannada':1500,'Marathi':1500,'Tamil':1500,'Punjabi':1500,'Gujarati':1500,'Malayalam':1500}  # company-wide regional language targets
+TELSPLIT={'CR':3917,'OD':1083}  # sums to the 5000 Telugu target
+REGT={'Telugu':5000,'Bangla':3000,'Kannada':1500,'Marathi':1500,'Tamil':1500,'Punjabi':1500,'Gujarati':1500,'Malayalam':1500}  # company-wide regional language targets
 REG=['Telugu','Bangla','Kannada','Marathi','Tamil','Punjabi','Gujarati','Malayalam']
 HIN=['Hindi','Bhojpuri','Haryanvi']
 MILESTONE=False  # no interim milestone: one smooth plan to the target
@@ -79,7 +79,9 @@ chd=hs.groupby('date').size().reindex(days,fill_value=0).values
 out={'nomile':not MILESTONE,'days':lab,'dnum':[x.day for x in days],'LAST':LAST,'REM':REM,'milestone':MILE,'F':F,'mileDay':MILE_DAY,'peakDay':(MILE_DAY if (STRICT and LAST<MILE_DAY) else PEAK_DAY),'strict':bool(STRICT and LAST<MILE_DAY),
  'co':series(chd,hsum,TH,MILE)}
 out['co'].update(calls=len(d),odia=int((d.Language=='Odia').sum()),eng=int((d.Language=='English').sum()),
- reg={l:int((d.Language==l).sum()) for l in REG},regt=REGT,unassigned=int(hs[hs.team=='UN'].shape[0]))
+ reg={l:int((d.Language==l).sum()) for l in REG},regt=REGT,
+ oth={l:int(n) for l,n in d[~d.Language.isin(REG+['Hindi'])].Language.value_counts().items()},
+ regd=d[d.Language.isin(REG)].groupby('date').size().reindex(days,fill_value=0).tolist(),unassigned=int(hs[hs.team=='UN'].shape[0]))
 out['teams']={}
 for T in TARGETS:
     S=d[d.team==T]; H=S[S.hin]
@@ -103,6 +105,8 @@ for T in TARGETS:
         dl=src[src.Language==l].groupby('date').size().reindex(days,fill_value=0).values.tolist()
         LR.append(dict(lang=l,target=tg,done=done,own=own,comp=comp,perday=max(tg-done,0)/REM,daily=dl))
     r['langs']=LR
+    r['oth']={l:int(n) for l,n in S[~S.Language.isin(REG+['Hindi'])].Language.value_counts().items()}
+    r['regd']=S[S.Language.isin(REG)].groupby('date').size().reindex(days,fill_value=0).tolist()
     h=H.groupby(['date','hour']).size().unstack(fill_value=0).reindex(index=days,columns=range(24),fill_value=0)
     r['heat']=h.values.tolist(); r['hourAvg']=h.loc[days[1:]].mean().round(1).tolist()
     am=H.groupby('date')['Patient mobile'].nunique().reindex(days,fill_value=0).values
@@ -112,7 +116,9 @@ for T in TARGETS:
 # code-wise rows (codes only)
 a=d[d.team!='UN']; c=a[a.hin].groupby(['code','date']).size().unstack(fill_value=0).reindex(index=sorted(a.code.unique()),columns=days,fill_value=0)  # every code, even with zero Hindi calls
 tm=a.groupby('code').team.first(); al=a.groupby('code').size(); ay=a[a.date==days[-1]].groupby('code').size()
-out['codes']=[[k,tm[k],int(c.loc[k].sum()),int(al[k]),c.loc[k].tolist(),int(ay.get(k,0))] for k in c.sum(axis=1).sort_values(ascending=False).index]
+rg=a[a.Language.isin(REG)]; rgl=rg.groupby(['code','Language']).size(); rgd=rg.groupby(['code','date']).size().unstack(fill_value=0).reindex(index=c.index,columns=days,fill_value=0)
+rgl_d={k:{l:int(n) for l,n in g.droplevel(0).items()} for k,g in rgl.groupby(level=0)}
+out['codes']=[[k,tm[k],int(c.loc[k].sum()),int(al[k]),c.loc[k].tolist(),int(ay.get(k,0)),int(rgd.loc[k].sum()),rgl_d.get(k,{}),rgd.loc[k].tolist()] for k in c.index]
 out['regTeam']={l:d[d.Language==l].groupby('team').size().to_dict() for l in REG}
 tpl=open('tpl.html').read()
 open('dashboard.html','w').write(tpl.replace('/*DATA*/null',json.dumps(out,default=float)))
