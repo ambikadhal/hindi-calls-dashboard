@@ -290,7 +290,7 @@ function dlSheet(T,btn){const r=D.teams[T],rows=D.codes.filter(c=>c[1]==T&&c[5]>
  cv.toBlob(b=>{const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=r.name.replace(/[^A-Za-z0-9]+/g,'-')+'-'+D.dnum[N-1]+'-Nov.png';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),2000);if(btn){const o=btn.textContent;btn.textContent='✓ Downloaded';setTimeout(()=>btn.textContent=o,1800)}})}
 /* ---------- motion helpers ---------- */
 const REDUCE=matchMedia('(prefers-reduced-motion:reduce)').matches;
-function fxBars(root){root.querySelectorAll('.bar i').forEach(i=>{const w=i.style.width;if(REDUCE)return;i.style.width='0%';requestAnimationFrame(()=>requestAnimationFrame(()=>i.style.width=w))})}
+function fxBars(root){root.querySelectorAll('.bar i').forEach(i=>{const w=i.dataset.w||(i.dataset.w=i.style.width);if(REDUCE)return;i.style.width='0%';requestAnimationFrame(()=>requestAnimationFrame(()=>i.style.width=w))})}
 function fx(root){
  root.querySelectorAll('.card,.tile,.act,.tcard').forEach((e,i)=>{e.classList.add('rise');e.style.animationDelay=Math.min(i*40,520)+'ms'});
  fxBars(root);
