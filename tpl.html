@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Hindi Calls Dashboard</title>
+<title>Calls Tracker</title>
 <style>
 :root{--bg:#f3f5f9;--card:#fff;--ink:#16202e;--mut:#64708a;--line:#e3e8f0;--blue:#2f6fed;--org:#f08a24;--teal:#12a594;--grn:#16a34a;--red:#e5484d;--amb:#e0a100;--hero1:#1d3a8a;--hero2:#2f6fed;--shade:rgba(240,138,36,.10);--soft:#eef3ff}
 @media(prefers-color-scheme:dark){:root{--bg:#0e1420;--card:#172033;--ink:#e8edf6;--mut:#92a0ba;--line:#26334c;--blue:#6b9bff;--org:#ffa24d;--teal:#3fd0bd;--grn:#4ade80;--red:#ff7a7f;--amb:#f5c542;--hero1:#16296b;--hero2:#2a58c9;--shade:rgba(255,162,77,.12);--soft:#1d2a45}}
@@ -89,11 +89,26 @@ details.how{margin-top:10px}
 }
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important}}
 .tile span b{display:inline;font-size:inherit;color:inherit}
+.lg{display:inline-block;filter:drop-shadow(0 2px 4px rgba(0,0,0,.25))}header h1{font-size:23px;font-weight:800;letter-spacing:.3px}header .tag{opacity:.9;font-size:13px;margin:2px 0 8px}
+.card{border-radius:16px}.card:hover{box-shadow:0 10px 26px rgba(20,30,60,.10)}
+.hero .big{font-size:52px}.hchips{margin-top:10px;display:flex;flex-wrap:wrap;gap:6px;align-items:center}.hchips span{background:rgba(255,255,255,.2);border-radius:16px;padding:2px 11px;font-size:12.5px;font-weight:600}.hchips em{font-style:normal;font-size:12px;opacity:.75}
+details.tile.lang{border-left:4px solid var(--lc,var(--blue));transition:transform .18s,box-shadow .18s}details.tile.lang:hover{transform:translateY(-3px);box-shadow:0 10px 24px rgba(20,30,60,.14)}
+details.lang summary>b{display:flex!important;justify-content:space-between;align-items:center;gap:6px}.pcb{font-style:normal;font-size:12px;font-weight:700;color:var(--lc,var(--blue));background:color-mix(in srgb,var(--lc,var(--blue)) 14%,transparent);border-radius:10px;padding:1px 8px;margin-top:0}
+.bar{height:10px}.split{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 8px}
+.spk{display:flex;align-items:center;gap:8px;margin-top:8px}.spk small{color:var(--mut);font-size:12px}.spark{width:110px;height:32px}
+.tcard{transition:transform .18s,box-shadow .18s}.tcard:hover{transform:translateY(-4px) scale(1.01)}
+.seg button{transition:background .15s,color .15s,transform .1s}.seg button:active{transform:scale(.95)}
+.tile.acc{background:linear-gradient(135deg,var(--soft),var(--card))}
+nav button{transition:transform .12s,background .15s,box-shadow .15s}nav button:active{transform:scale(.95)}
+.act{transition:transform .15s}.act:hover{transform:translateX(3px)}
+#up{position:fixed;right:16px;bottom:20px;width:44px;height:44px;border-radius:50%;border:0;background:var(--blue);color:#fff;font-size:20px;cursor:pointer;box-shadow:0 6px 18px rgba(47,111,237,.45);opacity:0;pointer-events:none;transform:translateY(12px);transition:.25s;z-index:20}
+#up.show{opacity:1;pointer-events:auto;transform:none}@media(max-width:700px){#up{bottom:84px}.hero .big{font-size:42px}}
 .dlb{border:0;background:var(--blue);color:#fff;border-radius:22px;padding:11px 22px;font:inherit;font-weight:600;cursor:pointer}.dlb:active{transform:scale(.97)}
 </style></head><body>
-<header><h1>Call target tracker</h1><p id="hsub"></p></header>
+<header><h1><span class="lg">📞</span> Calls Tracker</h1><p class="tag">Regional languages first · Hindi · every team</p><p id="hsub"></p></header>
 <nav id="nav"></nav><main id="main"></main>
 <footer>Team = referral-code prefix (CR/JSSK/SB = Craftzens · WB = ParisevaOne · OD = mDigital-OD). Hindi = Hindi language calls only. Updated every morning with the previous day's calls.<br><a href="index.html" style="color:var(--blue)">← Field team page (find my count)</a></footer>
+<button id="up" aria-label="Back to top">↑</button>
 <script>
 const D=/*DATA*/null;
 const TK=['CR','WB','OD'],COL={CR:'#2f6fed',WB:'#f08a24',OD:'#12a594'};
@@ -141,13 +156,24 @@ const mount=(id,o)=>setTimeout(()=>{const e=document.getElementById(id);if(e)mkC
 const tlab=i=>dn(i+1);
 /* ---------- helpers ---------- */
 const ring=(p,c)=>{const r=40,C=2*Math.PI*r;return `<svg class="ring" viewBox="0 0 100 100"><circle cx="50" cy="50" r="${r}" fill="none" stroke="rgba(255,255,255,.25)" stroke-width="10"/><circle cx="50" cy="50" r="${r}" fill="none" stroke="#fff" stroke-width="10" stroke-linecap="round" stroke-dasharray="0 ${C}" data-d="${C*Math.min(p,1)} ${C}" transform="rotate(-90 50 50)"/><text x="50" y="56" text-anchor="middle" font-size="20" font-weight="800">${pc(p)}</text></svg>`};
-const bar=(p,mk)=>`<div class="bar"><i style="width:${Math.min(Math.max(p,0),1)*100}%"></i>${mk!=null?`<u style="left:${mk*100}%"></u>`:''}</div>`;
+const bar=(p,mk,col)=>`<div class="bar"><i style="width:${Math.min(Math.max(p,0),1)*100}%${col?`;background:linear-gradient(90deg,${col},${col}cc)`:''}"></i>${mk!=null?`<u style="left:${mk*100}%"></u>`:''}</div>`;
 /* ---------- regional-first views: achieved and balance only ---------- */
 const REGL=Object.keys(D.co.reg);
+const LC={Telugu:'#2f6fed',Bangla:'#e5484d',Kannada:'#f08a24',Marathi:'#8b5cf6',Tamil:'#12a594',Punjabi:'#d19a00',Gujarati:'#ec4899',Malayalam:'#16a34a'},lc=l=>LC[l]||'#2f6fed';
 const left=(v,t)=>Math.max(t-v,0);
 const balTxt=(v,t)=>left(v,t)?`<b>${f(left(v,t))}</b> to go`:'✅ target achieved';
 const pctLeft=(v,t)=>left(v,t)/t;
-function langTile(l,v,t){return `<div class="tile"><b>${l}</b><div style="margin:6px 0">${bar(v/t)}</div><span>${f(v)} / ${f(t)} · ${balTxt(v,t)}</span></div>`}
+function langTile(l,v,t,attr){const c=lc(l);return `<details class="tile lang" ${attr||''} data-l="${l}" style="--lc:${c}"><summary><b>${l} <i class="pcb">${pc(v/t)}</i></b><div style="margin:6px 0">${bar(v/t,null,c)}</div><span>${f(v)} / ${f(t)} · ${balTxt(v,t)}</span><em class="hint">Tap for daily counts ▾</em></summary><div class="ld"></div></details>`}
+function bindLangs(root,getDaily,extra){root.querySelectorAll('details.lang').forEach(el=>el.addEventListener('toggle',()=>{if(!el.open||el.dataset.done)return;el.dataset.done=1;const l=el.dataset.l,dl=getDaily(el),box=el.querySelector('.ld'),tot=dl.reduce((p,c)=>p+c,0);
+  const days=dl.map((v,i)=>[i,v]).reverse();
+  box.innerHTML=`<div class="lchart"></div><div class="lsum"><div><b>${f(tot)}</b><span>total</span></div><div><b>${f(dl[dl.length-1])}</b><span>yesterday</span></div><div><b>${f(Math.max(...dl))}</b><span>best day</span></div><div><b>${f(avg(dl.slice(-7)))}</b><span>7-day avg</span></div></div>${extra?extra(l):''}<div class="tw"><table><tr><th>Day</th><th>Calls</th><th>Total so far</th></tr>${days.map(([i,v])=>`<tr class="${isSun(D.dnum[i])?'sun':''}"><td>${D.days[i]}</td><td><b>${f(v)}</b></td><td>${f(dl.slice(0,i+1).reduce((p,c)=>p+c,0))}</td></tr>`).join('')}</table></div>`;
+  mkChart(box.querySelector('.lchart'),{x:D.dnum,tl:i=>D.days[i],h:170,shade:D.dnum.map((n,i)=>isSun(n)?i:-1).filter(i=>i>=0),bars:[{n:l+' calls',c:lc(l),v:dl}]})}))}
+const teamSplit=l=>{const o=D.regTeam[l]||{};return `<div class="split">${Object.entries(o).sort((a,b)=>b[1]-a[1]).map(([t,n])=>`<span class="chip info">${t=='UN'?'Unassigned':D.teams[t].name}: <b>${f(n)}</b></span>`).join('')}</div>`};
+function spark(a,col){const W=120,H=34,mx=Math.max(...a,1),p=a.map((v,i)=>[i*(W/Math.max(a.length-1,1)),H-3-v/mx*(H-8)]);return `<svg viewBox="0 0 ${W} ${H}" class="spark"><path d="M${p.map(x=>x[0].toFixed(1)+' '+x[1].toFixed(1)).join('L')}" fill="none" stroke="${col}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/><circle cx="${p[p.length-1][0]}" cy="${p[p.length-1][1]}" r="3" fill="${col}"/></svg>`}
+let OVS='far';
+function rgSorted(){const c=D.co,R=c.regt,k=REGL.slice();if(OVS=='far')k.sort((a,b)=>pctLeft(c.reg[b],R[b])-pctLeft(c.reg[a],R[a]));else if(OVS=='near')k.sort((a,b)=>c.reg[b]/R[b]-c.reg[a]/R[a]);else k.sort((a,b)=>c.reg[b]-c.reg[a]);return k}
+function renderRg(){const c=D.co,R=c.regt,box=document.getElementById('rg');if(!box)return;box.innerHTML=rgSorted().map(l=>langTile(l,c.reg[l],R[l])).join('');bindLangs(box,el=>c.regl[el.dataset.l],teamSplit);fxBars(box);
+ document.querySelectorAll('#rgs button').forEach(b=>b.classList.toggle('on',b.dataset.k==OVS))}
 function othCard(o,note){const ks=Object.keys(o).sort((a,b)=>o[b]-o[a]);
  return `<div class="card" style="margin-top:12px"><h2>Other languages · done till date</h2><p class="sub">No targets for these. ${note||''}</p><div class="grid g4">${ks.map(l=>`<div class="tile"><b>${f(o[l])}</b><span>${l}</span></div>`).join('')}</div></div>`}
 function hindiCard(r,who){return `<div class="card" style="margin-top:12px"><h2>Hindi calls · ${who}</h2><p class="sub">Hindi language calls only. Target ${f(r.target)} by 30 Nov.</p><div style="margin:6px 0 10px">${bar(r.hindi/r.target)}</div><div class="grid" style="grid-template-columns:repeat(2,1fr)"><div class="tile acc"><b>${f(r.hindi)}</b><span>achieved (${pc(r.hindi/r.target)})</span></div><div class="tile"><b>${f(left(r.hindi,r.target))}</b><span>balance</span></div></div></div>`}
@@ -215,22 +241,23 @@ function codeTable(host,rows,o){
 /* ---------- pages ---------- */
 function overview(){const c=D.co,R=c.regt,ks=REGL.slice().sort((a,b)=>pctLeft(c.reg[b],R[b])-pctLeft(c.reg[a],R[a]));
  const tot=ks.reduce((p,l)=>p+R[l],0),dn_=ks.reduce((p,l)=>p+Math.min(c.reg[l],R[l]),0);
- let h=`<div class="card hero" style="border-left:5px solid var(--org)">${ring(dn_/tot)}<div class="txt"><small>🎯 Main focus · Regional languages</small><div class="big">${f(tot-dn_)}</div><small>regional calls still to go · ${f(dn_)} done of ${f(tot)} (${pc(dn_/tot)})</small></div></div>
- <div class="card" style="margin-top:12px"><h2>Regional languages</h2><p class="sub">Done against each target. Furthest from target first.</p><div class="grid g4">${ks.map(l=>langTile(l,c.reg[l],R[l])).join('')}</div></div>`;
+ let h=`<div class="card hero" style="border-left:5px solid var(--org)">${ring(dn_/tot)}<div class="txt"><small>🎯 Main focus · Regional languages</small><div class="big">${f(tot-dn_)}</div><small>regional calls still to go · ${f(dn_)} done of ${f(tot)} (${pc(dn_/tot)})</small><div class="hchips">${ks.slice().sort((a,b)=>c.reg[b]/R[b]-c.reg[a]/R[a]).slice(0,3).map(l=>`<span>${l} ${pc(c.reg[l]/R[l])}</span>`).join('')}<em>closest to target</em></div></div></div>
+ <div class="card" style="margin-top:12px"><h2>Regional languages</h2><p class="sub">Tap a language for its daily chart and team split.</p><div class="seg" id="rgs"><button data-k="far">Furthest</button><button data-k="near">Closest</button><button data-k="most">Most calls</button></div><div class="grid g4" id="rg" style="margin-top:10px"></div></div>`;
  h+=othCard(c.oth,'Bhojpuri and Haryanvi are not part of the Hindi count.');
  h+=hindiCard(c,'company');
  h+=`<h2 style="margin:18px 2px 8px;font-size:17px">Teams <span style="font-weight:400;font-size:13px;color:var(--mut)">· tap a card to open</span></h2><div class="grid g3">`;
- TK.forEach(t=>{const r=D.teams[t],rg=r.regd.reduce((p,x)=>p+x,0);h+=`<div class="card tcard" style="--c:${COL[t]}" onclick="go('${t}')"><b style="font-size:16px">${r.name}</b><div class="grid" style="grid-template-columns:1fr 1fr;margin-top:10px"><div><span class="sub" style="margin:0">Regional calls</span><br><b style="font-size:20px">${f(rg)}</b></div><div><span class="sub" style="margin:0">Yesterday</span><br><b style="font-size:20px">${f(r.regd[r.regd.length-1])}</b></div></div><div style="margin:10px 0 6px">${bar(r.hindi/r.target)}</div><div style="font-size:13.5px">Hindi: ${f(r.hindi)} / ${f(r.target)} · ${f(left(r.hindi,r.target))} balance</div></div>`});
+ TK.forEach(t=>{const r=D.teams[t],rg=r.regd.reduce((p,x)=>p+x,0);h+=`<div class="card tcard" style="--c:${COL[t]}" onclick="go('${t}')"><b style="font-size:16px">${r.name}</b><div class="grid" style="grid-template-columns:1fr 1fr;margin-top:10px"><div><span class="sub" style="margin:0">Regional calls</span><br><b style="font-size:20px">${f(rg)}</b></div><div><span class="sub" style="margin:0">Yesterday</span><br><b style="font-size:20px">${f(r.regd[r.regd.length-1])}</b></div></div><div class="spk">${spark(r.regd,COL[t])}<small>regional calls per day</small></div><div style="margin:10px 0 6px">${bar(r.hindi/r.target)}</div><div style="font-size:13.5px">Hindi: ${f(r.hindi)} / ${f(r.target)} · ${f(left(r.hindi,r.target))} balance</div></div>`});
  h+=`</div><div class="card" style="margin-top:12px"><h2>Daily regional calls</h2><p class="sub">All regional languages, whole company. Hover or tap for numbers.</p><div id="o-r"></div></div>
  <div class="grid g2" style="margin-top:12px"><div class="card"><h2>Daily Hindi calls by team</h2><p class="sub">Hover or tap for numbers. Tap a team name to hide it.</p><div id="o-t"></div></div><div class="card"><h2>Hindi running total</h2><p class="sub">Line = calls so far. Top line = ${f(c.target)} target.</p><div id="o-c"></div></div></div>
  <details class="card"><summary>How to read this</summary><p class="help">Regional languages = Telugu, Bangla, Kannada, Marathi, Tamil, Punjabi, Gujarati and Malayalam, counted company-wide against their targets. Hindi = Hindi language calls only (Bhojpuri and Haryanvi are counted separately). Team = referral-code prefix (CR/JSSK/SB = Craftzens · WB = ParisevaOne · OD = mDigital-OD). ${f(c.unassigned)} Hindi calls have referral codes that match no team; they count only in company totals.</p></details>`;
  return h}
 function mount_overview(){const c=D.co;
+ renderRg();document.getElementById('rgs').onclick=e=>{const b=e.target.closest('button');if(b){OVS=b.dataset.k;renderRg()}};
  mount('o-r',{x:MONTH.slice(0,N),tl:tlab,h:200,bars:[{n:'Regional calls',c:'#f08a24',v:c.regd}]});
  mount('o-t',{x:MONTH.slice(0,N),tl:tlab,h:240,lines:TK.map(t=>({n:D.teams[t].name,c:COL[t],v:D.teams[t].hd,dots:1}))});
  mount('o-c',{x:MONTH,tl:tlab,h:240,lines:[{n:'Done so far',c:'#2f6fed',w:3,v:pad(c.cumact,0)}],hlines:[{v:c.target,label:'Target '+lk(c.target),c:'#16a34a'}]})}
 function team(T){const r=D.teams[T],col=COL[T],tips=teamTips(T);
- let h=`<div class="card" style="border-left:5px solid var(--org)"><h2>🎯 Regional languages · ${r.name}</h2><p class="sub">Tap a language to see its day-by-day counts. Counts are all calls in that language${r.langs.some(x=>x.lang=='Telugu')?' (Telugu: this team only)':''}.</p><div class="grid g3 langs" style="margin-top:8px">${r.langs.map((x,i)=>`<details class="tile lang" data-i="${i}"><summary><b>${x.lang}</b><div style="margin:6px 0">${bar(x.done/x.target)}</div><span>${f(x.done)} / ${f(x.target)} · ${balTxt(x.done,x.target)}</span><em class="hint">Tap for daily counts ▾</em></summary><div class="ld"></div></details>`).join('')}</div></div>`;
+ let h=`<div class="card" style="border-left:5px solid var(--org)"><h2>🎯 Regional languages · ${r.name}</h2><p class="sub">Tap a language to see its day-by-day counts. Counts are all calls in that language${r.langs.some(x=>x.lang=='Telugu')?' (Telugu: this team only)':''}.</p><div class="grid g3 langs" style="margin-top:8px">${r.langs.map((x,i)=>langTile(x.lang,x.done,x.target,`data-i="${i}"`)).join('')}</div></div>`;
  h+=othCard(r.oth,'');
  h+=hindiCard(r,r.name);
  h+=`<div class="card" style="margin-top:12px"><h2>💡 Tips to increase regional calls</h2><p class="sub">Based on this team's own codes</p><div class="acts" style="margin-top:8px">${tips.map((a,i)=>`<div class="act"><div class="n">${i+1}</div><div><b>${a[0]} ${a[1]}</b><span>${a[2]}</span></div></div>`).join('')}</div></div>
@@ -243,10 +270,7 @@ function mount_team(T){const r=D.teams[T],col=COL[T];
  mount('t-r',{x:MONTH.slice(0,N),tl:tlab,shade:MONTH.slice(0,N).map((n,i)=>isSun(n)?i:-1).filter(i=>i>=0),h:210,bars:[{n:'Regional calls',c:col,v:r.regd}]});
  mount('t-c',{x:MONTH,tl:tlab,h:210,lines:[{n:'Done so far',c:col,w:3,v:pad(r.cumact,0)}],hlines:[{v:r.target,label:'Target '+lk(r.target)}]});
  codeTable(document.getElementById('ct'),codeRows(T),{});
- document.querySelectorAll('details.lang').forEach(el=>el.addEventListener('toggle',()=>{if(!el.open||el.dataset.done)return;el.dataset.done=1;const x=r.langs[+el.dataset.i],box=el.querySelector('.ld'),dl=x.daily,tot=dl.reduce((p,c)=>p+c,0);
-  const days=dl.map((v,i)=>[i,v]).reverse();
-  box.innerHTML=`<div class="lchart"></div><div class="lsum"><div><b>${f(tot)}</b><span>total</span></div><div><b>${f(dl[dl.length-1])}</b><span>yesterday</span></div><div><b>${f(Math.max(...dl))}</b><span>best day</span></div><div><b>${f(avg(dl.slice(-7)))}</b><span>7-day avg</span></div></div><div class="tw"><table><tr><th>Day</th><th>Calls</th><th>Total so far</th></tr>${days.map(([i,v])=>`<tr class="${isSun(D.dnum[i])?'sun':''}"><td>${D.days[i]}</td><td><b>${f(v)}</b></td><td>${f(dl.slice(0,i+1).reduce((p,c)=>p+c,0))}</td></tr>`).join('')}</table></div>`;
-  mkChart(box.querySelector('.lchart'),{x:D.dnum,tl:i=>D.days[i],h:170,shade:D.dnum.map((n,i)=>isSun(n)?i:-1).filter(i=>i>=0),bars:[{n:x.lang+' calls',c:col,v:dl}]})}));
+ bindLangs(document,el=>r.langs[+el.dataset.i].daily);
  mount('th',{x:Array.from({length:24},(_,i)=>i),tl:i=>i+':00–'+(i+1)+':00',h:200,bars:[{n:'Avg Hindi calls',c:col,v:r.hourAvg}],fmt:v=>f(v)});
  const mx=Math.max(...r.heat.flat(),1);let s='<div></div>'+Array.from({length:24},(_,i)=>`<div class="h">${i%3==0?i:''}</div>`).join('');
  r.heat.forEach((row,d)=>{s+=`<div class="r">${D.days[d].split(' ').slice(0,2).join(' ')}</div>`+row.map((v,h)=>`<div title="${D.days[d]} ${h}:00 → ${v} calls" style="background:${col};opacity:${.07+.93*v/mx}"></div>`).join('')});document.getElementById('hm').innerHTML=s}
@@ -282,8 +306,9 @@ function render(keep){let k=location.hash.slice(1);if(!TABS.some(t=>t[0]==k))k='
  document.getElementById('nav').innerHTML=TABS.map(t=>`<button class="${t[0]==k?'on':''}" onclick="go('${t[0]}')"><span class="ic">${t[2]}</span><span class="lf">${t[1]}</span><span class="ls">${t[3]}</span></button>`).join('');
  const m=document.getElementById('main');m.innerHTML=k=='ov'?overview():k=='codes'?codesPage():team(k);
  if(k=='ov')mount_overview();else if(k=='codes')mount_codes();else mount_team(k);fx(m);if(!keep)scrollTo(0,0);const on=document.querySelector('nav button.on');if(on&&on.scrollIntoView)on.scrollIntoView({inline:'center',block:'nearest'})}
-document.getElementById('hsub').innerHTML=`<span class="pill">Data up to ${D.days[N-1]}</span><span class="pill">${REM} days left</span><span class="pill">Target by 30 Nov</span>`;
+document.getElementById('hsub').innerHTML=`<span class="pill">Data up to ${D.days[N-1]}</span><span class="pill">${REM} days left</span><span class="pill">Targets by 30 Nov</span>`;
 let _b=innerWidth<520?1:innerWidth<700?2:3,_t;addEventListener('resize',()=>{clearTimeout(_t);_t=setTimeout(()=>{const b=innerWidth<520?1:innerWidth<700?2:3;if(b!=_b){_b=b;render(1)}},250)});
+const up=document.getElementById('up');up.onclick=()=>scrollTo({top:0,behavior:'smooth'});addEventListener('scroll',()=>up.classList.toggle('show',scrollY>500),{passive:true});
 addEventListener('hashchange',()=>render());render();
 </script><script data-goatcounter="https://hindicallscounter.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 </body></html>

@@ -81,6 +81,7 @@ out={'nomile':not MILESTONE,'days':lab,'dnum':[x.day for x in days],'LAST':LAST,
 out['co'].update(calls=len(d),odia=int((d.Language=='Odia').sum()),eng=int((d.Language=='English').sum()),
  reg={l:int((d.Language==l).sum()) for l in REG},regt=REGT,
  oth={l:int(n) for l,n in d[~d.Language.isin(REG+['Hindi'])].Language.value_counts().items()},
+ regl={l:d[d.Language==l].groupby('date').size().reindex(days,fill_value=0).tolist() for l in REG},
  regd=d[d.Language.isin(REG)].groupby('date').size().reindex(days,fill_value=0).tolist(),unassigned=int(hs[hs.team=='UN'].shape[0]))
 out['teams']={}
 for T in TARGETS:
