@@ -93,7 +93,7 @@ details.how{margin-top:10px}
 </style></head><body>
 <header><h1>Call target tracker</h1><p id="hsub"></p></header>
 <nav id="nav"></nav><main id="main"></main>
-<footer>Team = referral-code prefix (CR/JSSK/SB = Craftzens · WB = ParisevaOne · OD = mDigital-OD). Hindi = Hindi + Bhojpuri + Haryanvi. Updated every morning with the previous day's calls.<br><a href="index.html" style="color:var(--blue)">← Field team page (find my count)</a></footer>
+<footer>Team = referral-code prefix (CR/JSSK/SB = Craftzens · WB = ParisevaOne · OD = mDigital-OD). Hindi = Hindi language calls only. Updated every morning with the previous day's calls.<br><a href="index.html" style="color:var(--blue)">← Field team page (find my count)</a></footer>
 <script>
 const D=/*DATA*/null;
 const TK=['CR','WB','OD'],COL={CR:'#2f6fed',WB:'#f08a24',OD:'#12a594'};
@@ -150,7 +150,7 @@ const pctLeft=(v,t)=>left(v,t)/t;
 function langTile(l,v,t){return `<div class="tile"><b>${l}</b><div style="margin:6px 0">${bar(v/t)}</div><span>${f(v)} / ${f(t)} · ${balTxt(v,t)}</span></div>`}
 function othCard(o,note){const ks=Object.keys(o).sort((a,b)=>o[b]-o[a]);
  return `<div class="card" style="margin-top:12px"><h2>Other languages · done till date</h2><p class="sub">No targets for these. ${note||''}</p><div class="grid g4">${ks.map(l=>`<div class="tile"><b>${f(o[l])}</b><span>${l}</span></div>`).join('')}</div></div>`}
-function hindiCard(r,who){return `<div class="card" style="margin-top:12px"><h2>Hindi calls · ${who}</h2><p class="sub">Hindi, Bhojpuri and Haryanvi together. Target ${f(r.target)} by 30 Nov.</p><div style="margin:6px 0 10px">${bar(r.hindi/r.target)}</div><div class="grid" style="grid-template-columns:repeat(2,1fr)"><div class="tile acc"><b>${f(r.hindi)}</b><span>achieved (${pc(r.hindi/r.target)})</span></div><div class="tile"><b>${f(left(r.hindi,r.target))}</b><span>balance</span></div></div></div>`}
+function hindiCard(r,who){return `<div class="card" style="margin-top:12px"><h2>Hindi calls · ${who}</h2><p class="sub">Hindi language calls only. Target ${f(r.target)} by 30 Nov.</p><div style="margin:6px 0 10px">${bar(r.hindi/r.target)}</div><div class="grid" style="grid-template-columns:repeat(2,1fr)"><div class="tile acc"><b>${f(r.hindi)}</b><span>achieved (${pc(r.hindi/r.target)})</span></div><div class="tile"><b>${f(left(r.hindi,r.target))}</b><span>balance</span></div></div></div>`}
 function codeRows(T){return D.codes.filter(c=>!T||c[1]==T).map(c=>({code:c[0],team:c[1],hindi:c[2],all:c[3],yall:c[5],reg:c[6],l:c[7],rd:c[8],yreg:c[8][c[8].length-1],last3:c[8].slice(-3).reduce((p,x)=>p+x,0),langs:Object.entries(c[7]).sort((a,b)=>b[1]-a[1])}))}
 function codeTip(r){const tl=D.teams[r.team].langs.map(x=>x.lang);
  if(r.reg==0)return r.hindi>=30?`Strong on Hindi (${f(r.hindi)}) but no regional calls yet. Ask this referrer to also bring ${tl.slice(0,3).join(' / ')} speaking contacts.`:'No regional calls yet. Ask this referrer to bring regional-language contacts.';
@@ -217,13 +217,13 @@ function overview(){const c=D.co,R=c.regt,ks=REGL.slice().sort((a,b)=>pctLeft(c.
  const tot=ks.reduce((p,l)=>p+R[l],0),dn_=ks.reduce((p,l)=>p+Math.min(c.reg[l],R[l]),0);
  let h=`<div class="card hero" style="border-left:5px solid var(--org)">${ring(dn_/tot)}<div class="txt"><small>🎯 Main focus · Regional languages</small><div class="big">${f(tot-dn_)}</div><small>regional calls still to go · ${f(dn_)} done of ${f(tot)} (${pc(dn_/tot)})</small></div></div>
  <div class="card" style="margin-top:12px"><h2>Regional languages</h2><p class="sub">Done against each target. Furthest from target first.</p><div class="grid g4">${ks.map(l=>langTile(l,c.reg[l],R[l])).join('')}</div></div>`;
- h+=othCard(c.oth,'Bhojpuri and Haryanvi are also counted inside the Hindi total below.');
+ h+=othCard(c.oth,'Bhojpuri and Haryanvi are not part of the Hindi count.');
  h+=hindiCard(c,'company');
  h+=`<h2 style="margin:18px 2px 8px;font-size:17px">Teams <span style="font-weight:400;font-size:13px;color:var(--mut)">· tap a card to open</span></h2><div class="grid g3">`;
  TK.forEach(t=>{const r=D.teams[t],rg=r.regd.reduce((p,x)=>p+x,0);h+=`<div class="card tcard" style="--c:${COL[t]}" onclick="go('${t}')"><b style="font-size:16px">${r.name}</b><div class="grid" style="grid-template-columns:1fr 1fr;margin-top:10px"><div><span class="sub" style="margin:0">Regional calls</span><br><b style="font-size:20px">${f(rg)}</b></div><div><span class="sub" style="margin:0">Yesterday</span><br><b style="font-size:20px">${f(r.regd[r.regd.length-1])}</b></div></div><div style="margin:10px 0 6px">${bar(r.hindi/r.target)}</div><div style="font-size:13.5px">Hindi: ${f(r.hindi)} / ${f(r.target)} · ${f(left(r.hindi,r.target))} balance</div></div>`});
  h+=`</div><div class="card" style="margin-top:12px"><h2>Daily regional calls</h2><p class="sub">All regional languages, whole company. Hover or tap for numbers.</p><div id="o-r"></div></div>
  <div class="grid g2" style="margin-top:12px"><div class="card"><h2>Daily Hindi calls by team</h2><p class="sub">Hover or tap for numbers. Tap a team name to hide it.</p><div id="o-t"></div></div><div class="card"><h2>Hindi running total</h2><p class="sub">Line = calls so far. Top line = ${f(c.target)} target.</p><div id="o-c"></div></div></div>
- <details class="card"><summary>How to read this</summary><p class="help">Regional languages = Telugu, Bangla, Kannada, Marathi, Tamil, Punjabi, Gujarati and Malayalam, counted company-wide against their targets. Hindi = Hindi + Bhojpuri + Haryanvi. Team = referral-code prefix (CR/JSSK/SB = Craftzens · WB = ParisevaOne · OD = mDigital-OD). ${f(c.unassigned)} Hindi calls have referral codes that match no team; they count only in company totals.</p></details>`;
+ <details class="card"><summary>How to read this</summary><p class="help">Regional languages = Telugu, Bangla, Kannada, Marathi, Tamil, Punjabi, Gujarati and Malayalam, counted company-wide against their targets. Hindi = Hindi language calls only (Bhojpuri and Haryanvi are counted separately). Team = referral-code prefix (CR/JSSK/SB = Craftzens · WB = ParisevaOne · OD = mDigital-OD). ${f(c.unassigned)} Hindi calls have referral codes that match no team; they count only in company totals.</p></details>`;
  return h}
 function mount_overview(){const c=D.co;
  mount('o-r',{x:MONTH.slice(0,N),tl:tlab,h:200,bars:[{n:'Regional calls',c:'#f08a24',v:c.regd}]});

@@ -46,7 +46,7 @@ footer{text-align:center;color:var(--mut);font-size:12.5px;padding:6px 16px 28px
 const D=/*DATA*/null;
 const f=x=>Math.round(x).toLocaleString('en-IN'),avg=a=>a.length?a.reduce((s,x)=>s+x,0)/a.length:0,sum=a=>a.reduce((s,x)=>s+x,0);
 const WD=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'],isSun=n=>new Date(2026,10,n).getDay()==0;
-const HIN=['Hindi','Bhojpuri','Haryanvi'],SKIP=['Odia','English'],REGL=['Telugu','Bangla','Kannada','Marathi','Tamil','Punjabi','Gujarati','Malayalam'],N=D.days.length;
+const HIN=['Hindi'],SKIP=['Odia','English'],REGL=['Telugu','Bangla','Kannada','Marathi','Tamil','Punjabi','Gujarati','Malayalam'],N=D.days.length;
 const $=id=>document.getElementById(id),q=$('q'),sug=$('sug'),out=$('out');
 const names=Object.keys(D.codes);
 const hrl=h=>(h%12||12)+(h<12?' am':' pm');
