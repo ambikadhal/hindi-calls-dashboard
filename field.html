@@ -117,7 +117,7 @@ function show(code){const c=D.codes[code],a=c.a,h=c.h,tot=sum(a),y=a[N-1],b7=avg
 function home(){const r=(store('recent')||'').split(',').filter(x=>x&&D.codes[x]);
  out.innerHTML=`<div class="empty"><div class="e">👆</div><p>Start typing your referral code above, then tap it in the list.</p>${r.length?`<p style="font-size:13px">Recently viewed</p><div class="recent">${r.map(c=>`<button data-c="${c}">${c}</button>`).join('')}</div>`:''}</div>`;
  out.querySelectorAll('.recent button').forEach(b=>b.onclick=()=>pick(b.dataset.c))}
-$('ft').innerHTML=`Counts are updated every morning with the previous day's calls · data up to ${D.upto}<br><a href="dashboard.html">Calls tracker (team view) →</a>`;
+$('ft').innerHTML=`Counts are updated every morning with the previous day's calls · data up to ${D.upto} · 18 Nov calls are in QC<br><a href="dashboard.html">Calls tracker (team view) →</a>`;
 addEventListener('hashchange',()=>{const c=decodeURIComponent(location.hash.slice(1)).toUpperCase();D.codes[c]?(q.value=c,show(c)):home()});
 const c0=decodeURIComponent(location.hash.slice(1)).toUpperCase();D.codes[c0]?(q.value=c0,show(c0)):home();
 </script><script data-goatcounter="https://hindicallscounter.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
