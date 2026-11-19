@@ -306,7 +306,7 @@ function render(keep){let k=location.hash.slice(1);if(!TABS.some(t=>t[0]==k))k='
  document.getElementById('nav').innerHTML=TABS.map(t=>`<button class="${t[0]==k?'on':''}" onclick="go('${t[0]}')"><span class="ic">${t[2]}</span><span class="lf">${t[1]}</span><span class="ls">${t[3]}</span></button>`).join('');
  const m=document.getElementById('main');m.innerHTML=k=='ov'?overview():k=='codes'?codesPage():team(k);
  if(k=='ov')mount_overview();else if(k=='codes')mount_codes();else mount_team(k);fx(m);if(!keep)scrollTo(0,0);const on=document.querySelector('nav button.on');if(on&&on.scrollIntoView)on.scrollIntoView({inline:'center',block:'nearest'})}
-document.getElementById('hsub').innerHTML=`<span class="pill">Data up to ${D.days[N-1]}</span><span class="pill">⏳ 18 Nov calls in QC</span><span class="pill">${REM} days left</span><span class="pill">Targets by 30 Nov</span>`;
+document.getElementById('hsub').innerHTML=`<span class="pill">Data up to ${D.days[N-1]}</span><span class="pill">⏳ 19 Nov calls in QC</span><span class="pill">${REM} days left</span><span class="pill">Targets by 30 Nov</span>`;
 let _b=innerWidth<520?1:innerWidth<700?2:3,_t;addEventListener('resize',()=>{clearTimeout(_t);_t=setTimeout(()=>{const b=innerWidth<520?1:innerWidth<700?2:3;if(b!=_b){_b=b;render(1)}},250)});
 const up=document.getElementById('up');up.onclick=()=>scrollTo({top:0,behavior:'smooth'});addEventListener('scroll',()=>up.classList.toggle('show',scrollY>500),{passive:true});
 addEventListener('hashchange',()=>render());render();
