@@ -2,8 +2,8 @@
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Calls Tracker</title>
 <style>
-:root{--bg:#f3f5f9;--card:#fff;--ink:#16202e;--mut:#64708a;--line:#e3e8f0;--blue:#2f6fed;--org:#f08a24;--teal:#12a594;--grn:#16a34a;--red:#e5484d;--amb:#e0a100;--hero1:#1d3a8a;--hero2:#2f6fed;--shade:rgba(240,138,36,.10);--soft:#eef3ff}
-@media(prefers-color-scheme:dark){:root{--bg:#0e1420;--card:#172033;--ink:#e8edf6;--mut:#92a0ba;--line:#26334c;--blue:#6b9bff;--org:#ffa24d;--teal:#3fd0bd;--grn:#4ade80;--red:#ff7a7f;--amb:#f5c542;--hero1:#16296b;--hero2:#2a58c9;--shade:rgba(255,162,77,.12);--soft:#1d2a45}}
+:root{--bg:#f6f5fb;--card:#fff;--ink:#1b1836;--mut:#6b6890;--line:#e8e6f3;--blue:#6d4aff;--org:#ff7a45;--teal:#0fb5a6;--grn:#12a36b;--red:#ef4565;--amb:#e9a400;--hero1:#2a1b6e;--hero2:#6d4aff;--shade:rgba(255,122,69,.10);--soft:#f0ecff}
+@media(prefers-color-scheme:dark){:root{--bg:#0f0d1f;--card:#19163a;--ink:#ece9ff;--mut:#a29ec8;--line:#2b2758;--blue:#a58bff;--org:#ff9566;--teal:#3be0cf;--grn:#4ade9a;--red:#ff7a93;--amb:#f5c542;--hero1:#1c1360;--hero2:#5a3ce0;--shade:rgba(255,149,102,.13);--soft:#241f52}}
 *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
 header{background:linear-gradient(120deg,var(--hero1),var(--hero2));color:#fff;padding:16px 16px 14px}
 header h1{margin:0;font-size:20px;letter-spacing:.2px}header p{margin:3px 0 0;font-size:13px;opacity:.88}
@@ -49,7 +49,7 @@ details.lang .hint{display:block;margin-top:6px;font-style:normal;font-size:12px
 /* ---- motion + mobile layer ---- */
 header{background:linear-gradient(120deg,var(--hero1),var(--hero2),var(--hero1));background-size:220% 100%;animation:flow 14s ease-in-out infinite alternate;position:relative;overflow:hidden}
 header:after,.hero:after{content:"";position:absolute;right:-60px;top:-70px;width:220px;height:220px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.22),transparent 68%);animation:float 9s ease-in-out infinite alternate;pointer-events:none}
-.hero{position:relative;overflow:hidden;background-size:220% 100%;animation:flow 14s ease-in-out infinite alternate;box-shadow:0 10px 26px rgba(29,58,138,.28)}
+.hero{position:relative;overflow:hidden;background-size:220% 100%;animation:flow 14s ease-in-out infinite alternate;box-shadow:0 10px 26px rgba(42,27,110,.28)}
 @keyframes flow{to{background-position:100% 0}}@keyframes float{to{transform:translate(-26px,22px) scale(1.15)}}
 @keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
 @keyframes grow{from{transform:scaleY(0)}}@keyframes fade{from{opacity:0}}
@@ -58,7 +58,7 @@ header:after,.hero:after{content:"";position:absolute;right:-60px;top:-70px;widt
 .bar i{transition:width 1s cubic-bezier(.2,.8,.2,1)}.ring circle{transition:stroke-dasharray 1.3s cubic-bezier(.2,.8,.2,1)}
 .card,.tile{transition:transform .2s,box-shadow .2s}.card:hover,.tile:hover{box-shadow:0 8px 22px rgba(20,30,60,.10)}
 nav button{display:flex;align-items:center;gap:6px}nav .ic{font-size:15px}nav .ls{display:none}
-nav button.on{box-shadow:0 4px 12px rgba(47,111,237,.35)}
+nav button.on{box-shadow:0 4px 12px rgba(109,74,255,.35)}
 .flt .row2{display:flex;gap:8px;flex:1 1 auto}.flt .row2 select{flex:1;min-width:0}.flt .q{flex:1 1 220px;min-width:0}
 .so{display:none}.seg{display:flex;overflow-x:auto;gap:6px;max-width:100%;-webkit-overflow-scrolling:touch}.seg button{border-radius:20px!important;white-space:nowrap}.seg em{font-style:normal;opacity:.7;margin-left:3px;font-size:11.5px}
 .meta{font-size:12.5px;color:var(--mut);margin:0 0 6px}
@@ -101,8 +101,30 @@ details.lang summary>b{display:flex!important;justify-content:space-between;alig
 .tile.acc{background:linear-gradient(135deg,var(--soft),var(--card))}
 nav button{transition:transform .12s,background .15s,box-shadow .15s}nav button:active{transform:scale(.95)}
 .act{transition:transform .15s}.act:hover{transform:translateX(3px)}
-#up{position:fixed;right:16px;bottom:20px;width:44px;height:44px;border-radius:50%;border:0;background:var(--blue);color:#fff;font-size:20px;cursor:pointer;box-shadow:0 6px 18px rgba(47,111,237,.45);opacity:0;pointer-events:none;transform:translateY(12px);transition:.25s;z-index:20}
+#up{position:fixed;right:16px;bottom:20px;width:44px;height:44px;border-radius:50%;border:0;background:var(--blue);color:#fff;font-size:20px;cursor:pointer;box-shadow:0 6px 18px rgba(109,74,255,.45);opacity:0;pointer-events:none;transform:translateY(12px);transition:.25s;z-index:20}
 #up.show{opacity:1;pointer-events:auto;transform:none}@media(max-width:700px){#up{bottom:84px}.hero .big{font-size:42px}}
+/* ---- refresh layer ---- */
+body{background:radial-gradient(900px 420px at 85% -80px,rgba(109,74,255,.13),transparent 70%),radial-gradient(700px 380px at 0 120px,rgba(255,122,69,.08),transparent 70%),var(--bg);background-attachment:fixed}
+header{background:linear-gradient(125deg,var(--hero1),var(--hero2) 60%,#b04cff);background-size:200% 100%;padding:20px 18px 16px}
+header h1{font-size:26px;font-weight:800}.pill{background:rgba(255,255,255,.16);backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.22);padding:3px 12px}
+nav{background:color-mix(in srgb,var(--card) 88%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+nav button{border:0;background:transparent;color:var(--mut);font-weight:600}nav button:hover{background:var(--soft);color:var(--blue)}
+nav button.on{background:linear-gradient(135deg,var(--blue),#9b6bff);color:#fff;box-shadow:0 6px 16px rgba(109,74,255,.38)}
+.card{border:1px solid color-mix(in srgb,var(--line) 80%,transparent);border-radius:20px;padding:16px;box-shadow:0 2px 6px rgba(42,27,110,.04),0 12px 30px rgba(42,27,110,.05)}
+.card h2{font-size:17px;font-weight:750;letter-spacing:.1px}
+.hero{background:linear-gradient(125deg,var(--hero1),var(--hero2) 65%,#c05bff);background-size:200% 100%}
+.tile{border-radius:16px}.bar{height:11px}.bar i{background:linear-gradient(90deg,var(--blue),#c05bff 60%,var(--org))}
+.dcard{border-top:4px solid var(--blue)}
+.lchips{display:flex;gap:7px;flex-wrap:wrap;margin:2px 0 8px}
+.lchips button{display:inline-flex;align-items:center;gap:6px;border:1.5px solid var(--line);background:var(--card);color:var(--ink);border-radius:20px;padding:5px 11px;font:inherit;font-size:13px;font-weight:600;cursor:pointer;transition:transform .12s,background .15s,border-color .15s,box-shadow .15s}
+.lchips button i{width:9px;height:9px;border-radius:50%;background:var(--lc)}.lchips button em{font-style:normal;font-weight:500;font-size:11.5px;color:var(--mut)}
+.lchips button:hover{border-color:var(--lc);transform:translateY(-1px)}.lchips button:active{transform:scale(.95)}
+.lchips button.on{background:var(--lc);border-color:var(--lc);color:#fff;box-shadow:0 5px 14px color-mix(in srgb,var(--lc) 45%,transparent)}.lchips button.on i{background:#fff}.lchips button.on em{color:#fff;opacity:.85}
+.dsum{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.dsum>div{flex:1 1 220px;display:flex;flex-wrap:wrap;gap:4px 12px;align-items:baseline;background:var(--soft);border-left:4px solid var(--lc);border-radius:12px;padding:8px 12px;font-size:12.5px;color:var(--mut)}.dsum b{color:var(--ink);font-size:14px;flex:1 0 100%}
+.leg button{border-radius:20px}
+#up{background:linear-gradient(135deg,var(--blue),#9b6bff)}
+@media(max-width:700px){nav button.on{background:var(--soft);color:var(--blue);box-shadow:none}header h1{font-size:22px}.card{border-radius:18px}}
 .dlb{border:0;background:var(--blue);color:#fff;border-radius:22px;padding:11px 22px;font:inherit;font-weight:600;cursor:pointer}.dlb:active{transform:scale(.97)}
 </style></head><body>
 <header><h1><span class="lg">📞</span> Calls Tracker</h1><p class="tag">Regional languages first · Hindi · every team</p><p id="hsub"></p></header>
@@ -111,7 +133,7 @@ nav button{transition:transform .12s,background .15s,box-shadow .15s}nav button:
 <button id="up" aria-label="Back to top">↑</button>
 <script>
 const D=/*DATA*/null;
-const TK=['CR','WB','OD'],COL={CR:'#2f6fed',WB:'#f08a24',OD:'#12a594'};
+const TK=['CR','WB','OD'],COL={CR:'#6d4aff',WB:'#ff7a45',OD:'#0fb5a6'};
 const N=D.days.length,LAST=D.LAST,REM=D.REM,first=LAST+1,MD=D.mileDay,MILE=D.milestone,PEAK=D.peakDay;
 const WD=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 const dn=n=>WD[new Date(2026,10,n).getDay()]+' '+n+' Nov', isSun=n=>new Date(2026,10,n).getDay()==0;
@@ -159,7 +181,7 @@ const ring=(p,c)=>{const r=40,C=2*Math.PI*r;return `<svg class="ring" viewBox="0
 const bar=(p,mk,col)=>`<div class="bar"><i style="width:${Math.min(Math.max(p,0),1)*100}%${col?`;background:linear-gradient(90deg,${col},${col}cc)`:''}"></i>${mk!=null?`<u style="left:${mk*100}%"></u>`:''}</div>`;
 /* ---------- regional-first views: achieved and balance only ---------- */
 const REGL=Object.keys(D.co.reg);
-const LC={Telugu:'#2f6fed',Bangla:'#e5484d',Kannada:'#f08a24',Marathi:'#8b5cf6',Tamil:'#12a594',Punjabi:'#d19a00',Gujarati:'#ec4899',Malayalam:'#16a34a'},lc=l=>LC[l]||'#2f6fed';
+const LC={Hindi:'#3b82f6',Telugu:'#ff7a45',Bangla:'#ef4565',Kannada:'#f59e0b',Marathi:'#a855f7',Tamil:'#0fb5a6',Punjabi:'#84cc16',Gujarati:'#ec4899',Malayalam:'#12a36b',Odia:'#0ea5e9',English:'#64748b',Bhojpuri:'#b45309',Haryanvi:'#78716c',Maithili:'#c026d3'},lc=l=>LC[l]||'#6d4aff';
 const left=(v,t)=>Math.max(t-v,0);
 const balTxt=(v,t)=>left(v,t)?`<b>${f(left(v,t))}</b> to go`:'✅ target achieved';
 const pctLeft=(v,t)=>left(v,t)/t;
@@ -239,10 +261,24 @@ function codeTable(host,rows,o){
  mq.addEventListener('change',draw);draw();fxBars(host);
 }
 /* ---------- pages ---------- */
+let DCSEL=new Set();
+function dailyChart(){const c=D.co,x=MONTH.slice(0,N),all=c.alld,AL=c.alll,tot=a=>a.reduce((p,v)=>p+v,0);
+ const langs=Object.keys(AL).sort((a,b)=>tot(AL[b])-tot(AL[a]));
+ const chips=document.getElementById('dcl');
+ const drawC=()=>{const sel=[...DCSEL];
+  chips.innerHTML=`<button class="${sel.length?'':'on'}" data-l="" style="--lc:#6d4aff">All languages</button>`+langs.map(l=>`<button class="${DCSEL.has(l)?'on':''}" data-l="${l}" style="--lc:${lc(l)}"><i></i>${l}<em>${f(tot(AL[l]))}</em></button>`).join('');
+  const bars=sel.length?[]:[{n:'All languages',c:'#6d4aff',v:all}];
+  const lines=sel.map(l=>({n:l,c:lc(l),w:2.8,v:AL[l],dots:1}));
+  mkChart(document.getElementById('dcc'),{x,tl:tlab,h:260,shade:D.dnum.map((n,i)=>isSun(n)?i:-1).filter(i=>i>=0),bars,lines});
+  const rows=sel.length?sel.map(l=>[l,AL[l],lc(l)]):[['All languages',all,'#6d4aff']];
+  document.getElementById('dcs').innerHTML=rows.map(([n,a,col])=>{const t=tot(a),pk=Math.max(...a);return `<div style="--lc:${col}"><b>${n}</b><span>${f(t)} total</span><span>${f(Math.round(t/a.length))}/day avg</span><span>best ${f(pk)} on ${tlab(a.lastIndexOf(pk))}</span><span>last day ${f(a[a.length-1])}</span></div>`}).join('')};
+ chips.onclick=e=>{const b=e.target.closest('button');if(!b)return;const l=b.dataset.l;if(!l)DCSEL.clear();else DCSEL.has(l)?DCSEL.delete(l):DCSEL.add(l);drawC()};
+ drawC()}
 function overview(){const c=D.co,R=c.regt,ks=REGL.slice().sort((a,b)=>pctLeft(c.reg[b],R[b])-pctLeft(c.reg[a],R[a]));
  const tot=ks.reduce((p,l)=>p+R[l],0),dn_=ks.reduce((p,l)=>p+Math.min(c.reg[l],R[l]),0);
  let h=`<div class="card hero" style="border-left:5px solid var(--org)">${ring(dn_/tot)}<div class="txt"><small>🎯 Main focus · Regional languages</small><div class="big">${f(tot-dn_)}</div><small>regional calls still to go · ${f(dn_)} done of ${f(tot)} (${pc(dn_/tot)})</small><div class="hchips">${ks.slice().sort((a,b)=>c.reg[b]/R[b]-c.reg[a]/R[a]).slice(0,3).map(l=>`<span>${l} ${pc(c.reg[l]/R[l])}</span>`).join('')}<em>closest to target</em></div></div></div>
- <div class="card" style="margin-top:12px"><h2>Regional languages</h2><p class="sub">Tap a language for its daily chart and team split.</p><div class="seg" id="rgs"><button data-k="far">Furthest</button><button data-k="near">Closest</button><button data-k="most">Most calls</button></div><div class="grid g4" id="rg" style="margin-top:10px"></div></div>`;
+<div class="card dcard" style="margin-top:12px"><h2>📈 Daily calls · all languages</h2><p class="sub">Bars show every call per day. Tap a language below to add its own daily line to the same chart.</p><div class="lchips" id="dcl"></div><div id="dcc"></div><div class="dsum" id="dcs"></div></div>
+  <div class="card" style="margin-top:12px"><h2>Regional languages</h2><p class="sub">Tap a language for its daily chart and team split.</p><div class="seg" id="rgs"><button data-k="far">Furthest</button><button data-k="near">Closest</button><button data-k="most">Most calls</button></div><div class="grid g4" id="rg" style="margin-top:10px"></div></div>`;
  h+=othCard(c.oth,'Bhojpuri and Haryanvi are not part of the Hindi count.');
  h+=hindiCard(c,'company');
  h+=`<h2 style="margin:18px 2px 8px;font-size:17px">Teams <span style="font-weight:400;font-size:13px;color:var(--mut)">· tap a card to open</span></h2><div class="grid g3">`;
@@ -252,10 +288,11 @@ function overview(){const c=D.co,R=c.regt,ks=REGL.slice().sort((a,b)=>pctLeft(c.
  <details class="card"><summary>How to read this</summary><p class="help">Regional languages = Telugu, Bangla, Kannada, Marathi, Tamil, Punjabi, Gujarati and Malayalam, counted company-wide against their targets. Hindi = Hindi language calls only (Bhojpuri and Haryanvi are counted separately). Team = referral-code prefix (CR/JSSK/SB = Craftzens · WB = ParisevaOne · OD = mDigital-OD). ${f(c.unassigned)} Hindi calls have referral codes that match no team; they count only in company totals.</p></details>`;
  return h}
 function mount_overview(){const c=D.co;
+ dailyChart();
  renderRg();document.getElementById('rgs').onclick=e=>{const b=e.target.closest('button');if(b){OVS=b.dataset.k;renderRg()}};
- mount('o-r',{x:MONTH.slice(0,N),tl:tlab,h:200,bars:[{n:'Regional calls',c:'#f08a24',v:c.regd}]});
+ mount('o-r',{x:MONTH.slice(0,N),tl:tlab,h:200,bars:[{n:'Regional calls',c:'#ff7a45',v:c.regd}]});
  mount('o-t',{x:MONTH.slice(0,N),tl:tlab,h:240,lines:TK.map(t=>({n:D.teams[t].name,c:COL[t],v:D.teams[t].hd,dots:1}))});
- mount('o-c',{x:MONTH,tl:tlab,h:240,lines:[{n:'Done so far',c:'#2f6fed',w:3,v:pad(c.cumact,0)}],hlines:[{v:c.target,label:'Target '+lk(c.target),c:'#16a34a'}]})}
+ mount('o-c',{x:MONTH,tl:tlab,h:240,lines:[{n:'Done so far',c:'#6d4aff',w:3,v:pad(c.cumact,0)}],hlines:[{v:c.target,label:'Target '+lk(c.target),c:'#12a36b'}]})}
 function team(T){const r=D.teams[T],col=COL[T],tips=teamTips(T);
  let h=`<div class="card" style="border-left:5px solid var(--org)"><h2>🎯 Regional languages · ${r.name}</h2><p class="sub">Tap a language to see its day-by-day counts. Counts are all calls in that language${r.langs.some(x=>x.lang=='Telugu')?' (Telugu: this team only)':''}.</p><div class="grid g3 langs" style="margin-top:8px">${r.langs.map((x,i)=>langTile(x.lang,x.done,x.target,`data-i="${i}"`)).join('')}</div></div>`;
  h+=othCard(r.oth,'');
@@ -306,7 +343,7 @@ function render(keep){let k=location.hash.slice(1);if(!TABS.some(t=>t[0]==k))k='
  document.getElementById('nav').innerHTML=TABS.map(t=>`<button class="${t[0]==k?'on':''}" onclick="go('${t[0]}')"><span class="ic">${t[2]}</span><span class="lf">${t[1]}</span><span class="ls">${t[3]}</span></button>`).join('');
  const m=document.getElementById('main');m.innerHTML=k=='ov'?overview():k=='codes'?codesPage():team(k);
  if(k=='ov')mount_overview();else if(k=='codes')mount_codes();else mount_team(k);fx(m);if(!keep)scrollTo(0,0);const on=document.querySelector('nav button.on');if(on&&on.scrollIntoView)on.scrollIntoView({inline:'center',block:'nearest'})}
-document.getElementById('hsub').innerHTML=`<span class="pill">Data up to ${D.days[N-1]}</span><span class="pill">⏳ 19 Nov calls in QC</span><span class="pill">${REM} days left</span><span class="pill">Targets by 30 Nov</span>`;
+document.getElementById('hsub').innerHTML=`<span class="pill">Data up to ${D.days[N-1]}</span><span class="pill">⏳ 20 Nov calls in QC</span><span class="pill">${REM} days left</span><span class="pill">Targets by 30 Nov</span>`;
 let _b=innerWidth<520?1:innerWidth<700?2:3,_t;addEventListener('resize',()=>{clearTimeout(_t);_t=setTimeout(()=>{const b=innerWidth<520?1:innerWidth<700?2:3;if(b!=_b){_b=b;render(1)}},250)});
 const up=document.getElementById('up');up.onclick=()=>scrollTo({top:0,behavior:'smooth'});addEventListener('scroll',()=>up.classList.toggle('show',scrollY>500),{passive:true});
 addEventListener('hashchange',()=>render());render();
