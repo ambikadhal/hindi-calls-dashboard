@@ -34,11 +34,13 @@ tr.sun td{background:rgba(240,138,36,.1)}.up{color:var(--grn)}.dn{color:var(--re
 .chip{display:inline-block;padding:1px 9px;border-radius:12px;font-size:12px;font-weight:600;background:var(--soft);color:var(--blue)}
 @keyframes rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}.card{animation:rise .4s cubic-bezier(.2,.8,.2,1) both}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.tbtn{display:flex;align-items:center;gap:12px;margin:0 0 12px;padding:13px 16px;border-radius:16px;background:linear-gradient(125deg,var(--hero1),var(--hero2) 70%,#c05bff);color:#fff!important;text-decoration:none;box-shadow:0 8px 20px rgba(109,74,255,.35);transition:transform .15s,box-shadow .15s}.tbtn:hover{transform:translateY(-2px)}.tbtn:active{transform:scale(.98)}.tbtn span{font-size:26px}.tbtn b{flex:1;font-size:16px;text-align:left}.tbtn small{display:block;font-weight:400;font-size:12px;opacity:.85}.tbtn i{font-style:normal;font-size:22px}.tbtn.top{margin-top:2px}.tbtn.foot{max-width:420px;margin:14px auto 0}
 footer{text-align:center;color:var(--mut);font-size:12.5px;padding:6px 16px 28px}footer a{color:var(--blue)}
 </style></head><body>
 <header><h1>📞 My Call Count</h1><p>Type your referral code to see your calls, day by day</p></header>
 <main>
 <div class="sbox"><span class="mg">🔍</span><input id="q" type="search" placeholder="Type your code, e.g. CRNI" autocomplete="off" autocapitalize="characters" spellcheck="false" enterkeyhint="go"><div class="sug" id="sug"></div></div>
+<a class="tbtn top" href="dashboard.html"><span>📊</span><b>Open Calls Tracker<small>Team view · charts · regional targets</small></b><i>→</i></a>
 <div id="out"></div>
 </main>
 <footer id="ft"></footer>
@@ -117,7 +119,7 @@ function show(code){const c=D.codes[code],a=c.a,h=c.h,tot=sum(a),y=a[N-1],b7=avg
 function home(){const r=(store('recent')||'').split(',').filter(x=>x&&D.codes[x]);
  out.innerHTML=`<div class="empty"><div class="e">👆</div><p>Start typing your referral code above, then tap it in the list.</p>${r.length?`<p style="font-size:13px">Recently viewed</p><div class="recent">${r.map(c=>`<button data-c="${c}">${c}</button>`).join('')}</div>`:''}</div>`;
  out.querySelectorAll('.recent button').forEach(b=>b.onclick=()=>pick(b.dataset.c))}
-$('ft').innerHTML=`Counts are updated every morning with the previous day's calls · data up to ${D.upto} · 20 Nov calls are in QC<br><a href="dashboard.html">Calls tracker (team view) →</a>`;
+$('ft').innerHTML=`Counts are updated every morning with the previous day's calls · data up to ${D.upto} · 20 Nov calls are in QC<br><a class="tbtn foot" href="dashboard.html"><span>📊</span><b>Open Calls Tracker<small>Team view · charts · regional targets</small></b><i>→</i></a>`;
 addEventListener('hashchange',()=>{const c=decodeURIComponent(location.hash.slice(1)).toUpperCase();D.codes[c]?(q.value=c,show(c)):home()});
 const c0=decodeURIComponent(location.hash.slice(1)).toUpperCase();D.codes[c0]?(q.value=c0,show(c0)):home();
 </script><script data-goatcounter="https://hindicallscounter.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>

@@ -125,6 +125,7 @@ nav button.on{background:linear-gradient(135deg,var(--blue),#9b6bff);color:#fff;
 .leg button{border-radius:20px}
 #up{background:linear-gradient(135deg,var(--blue),#9b6bff)}
 @media(max-width:700px){nav button.on{background:var(--soft);color:var(--blue);box-shadow:none}header h1{font-size:22px}.card{border-radius:18px}}
+.tip .bk{margin-top:5px;padding-top:5px;border-top:1px solid rgba(128,128,128,.35)}
 .dlb{border:0;background:var(--blue);color:#fff;border-radius:22px;padding:11px 22px;font:inherit;font-weight:600;cursor:pointer}.dlb:active{transform:scale(.97)}
 </style></head><body>
 <header><h1><span class="lg">📞</span> Calls Tracker</h1><p class="tag">Regional languages first · Hindi · every team</p><p id="hsub"></p></header>
@@ -166,7 +167,7 @@ function mkChart(host,o){
   const move=e=>{const r=svg.getBoundingClientRect(),px=(e.clientX-r.left)*W/r.width;let i=Math.floor((px-m.l)/bw);if(i<0||i>=n){tip.style.display='none';hv.setAttribute('opacity',0);return}
    hv.setAttribute('x',m.l+i*bw);hv.setAttribute('opacity',.08);
    const rows=vis.filter(q=>q.v[i]!=null).map(q=>`<div><span style="color:${q.c}">●</span> ${q.n}: <b>${(o.fmt||f)(q.v[i])}</b></div>`).join('');
-   tip.innerHTML=`<b>${o.tl?o.tl(i):o.x[i]}</b>${rows}`;tip.style.display='block';
+   tip.innerHTML=`<b>${o.tl?o.tl(i):o.x[i]}</b>${rows}${o.extra?o.extra(i):''}`;tip.style.display='block';
    const hr=host.getBoundingClientRect();let lx=e.clientX-hr.left+14;if(lx+tip.offsetWidth>hr.width)lx=e.clientX-hr.left-tip.offsetWidth-14;tip.style.left=Math.max(lx,0)+'px';tip.style.top=Math.max(e.clientY-hr.top-40,0)+'px'};
   svg.addEventListener('pointermove',move);svg.addEventListener('pointerdown',move);svg.addEventListener('pointerleave',()=>{tip.style.display='none';hv.setAttribute('opacity',0)});
  }
@@ -283,14 +284,14 @@ function overview(){const c=D.co,R=c.regt,ks=REGL.slice().sort((a,b)=>pctLeft(c.
  h+=hindiCard(c,'company');
  h+=`<h2 style="margin:18px 2px 8px;font-size:17px">Teams <span style="font-weight:400;font-size:13px;color:var(--mut)">· tap a card to open</span></h2><div class="grid g3">`;
  TK.forEach(t=>{const r=D.teams[t],rg=r.regd.reduce((p,x)=>p+x,0);h+=`<div class="card tcard" style="--c:${COL[t]}" onclick="go('${t}')"><b style="font-size:16px">${r.name}</b><div class="grid" style="grid-template-columns:1fr 1fr;margin-top:10px"><div><span class="sub" style="margin:0">Regional calls</span><br><b style="font-size:20px">${f(rg)}</b></div><div><span class="sub" style="margin:0">Yesterday</span><br><b style="font-size:20px">${f(r.regd[r.regd.length-1])}</b></div></div><div class="spk">${spark(r.regd,COL[t])}<small>regional calls per day</small></div><div style="margin:10px 0 6px">${bar(r.hindi/r.target)}</div><div style="font-size:13.5px">Hindi: ${f(r.hindi)} / ${f(r.target)} · ${f(left(r.hindi,r.target))} balance</div></div>`});
- h+=`</div><div class="card" style="margin-top:12px"><h2>Daily regional calls</h2><p class="sub">All regional languages, whole company. Hover or tap for numbers.</p><div id="o-r"></div></div>
+ h+=`</div><div class="card" style="margin-top:12px"><h2>Daily regional calls</h2><p class="sub">All regional languages, whole company. Hover or tap a day to see each language's count.</p><div id="o-r"></div></div>
  <div class="grid g2" style="margin-top:12px"><div class="card"><h2>Daily Hindi calls by team</h2><p class="sub">Hover or tap for numbers. Tap a team name to hide it.</p><div id="o-t"></div></div><div class="card"><h2>Hindi running total</h2><p class="sub">Line = calls so far. Top line = ${f(c.target)} target.</p><div id="o-c"></div></div></div>
  <details class="card"><summary>How to read this</summary><p class="help">Regional languages = Telugu, Bangla, Kannada, Marathi, Tamil, Punjabi, Gujarati and Malayalam, counted company-wide against their targets. Hindi = Hindi language calls only (Bhojpuri and Haryanvi are counted separately). Team = referral-code prefix (CR/JSSK/SB = Craftzens · WB = ParisevaOne · OD = mDigital-OD). ${f(c.unassigned)} Hindi calls have referral codes that match no team; they count only in company totals.</p></details>`;
  return h}
 function mount_overview(){const c=D.co;
  dailyChart();
  renderRg();document.getElementById('rgs').onclick=e=>{const b=e.target.closest('button');if(b){OVS=b.dataset.k;renderRg()}};
- mount('o-r',{x:MONTH.slice(0,N),tl:tlab,h:200,bars:[{n:'Regional calls',c:'#ff7a45',v:c.regd}]});
+ mount('o-r',{x:MONTH.slice(0,N),tl:tlab,h:220,bars:[{n:'Regional calls',c:'#ff7a45',v:c.regd}],extra:i=>`<div class="bk">${REGL.map(l=>[l,c.regl[l][i]]).filter(r=>r[1]>0).sort((a,b)=>b[1]-a[1]).map(([l,v])=>`<div><span style="color:${lc(l)}">●</span> ${l}: <b>${f(v)}</b></div>`).join('')}</div>`});
  mount('o-t',{x:MONTH.slice(0,N),tl:tlab,h:240,lines:TK.map(t=>({n:D.teams[t].name,c:COL[t],v:D.teams[t].hd,dots:1}))});
  mount('o-c',{x:MONTH,tl:tlab,h:240,lines:[{n:'Done so far',c:'#6d4aff',w:3,v:pad(c.cumact,0)}],hlines:[{v:c.target,label:'Target '+lk(c.target),c:'#12a36b'}]})}
 function team(T){const r=D.teams[T],col=COL[T],tips=teamTips(T);
