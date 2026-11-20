@@ -126,6 +126,11 @@ nav button.on{background:linear-gradient(135deg,var(--blue),#9b6bff);color:#fff;
 #up{background:linear-gradient(135deg,var(--blue),#9b6bff)}
 @media(max-width:700px){nav button.on{background:var(--soft);color:var(--blue);box-shadow:none}header h1{font-size:22px}.card{border-radius:18px}}
 .tip .bk{margin-top:5px;padding-top:5px;border-top:1px solid rgba(128,128,128,.35)}
+.hgrid{display:grid;gap:12px;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr)}.hgrid>.card{margin:0}
+.tot{display:flex;flex-direction:column;justify-content:center;border-top:4px solid var(--blue);background:linear-gradient(160deg,var(--card),var(--soft))}
+.tot small{color:var(--mut);font-size:13px}.tot .big{font-size:44px;font-weight:800;line-height:1.05;margin:4px 0;color:var(--blue)}.tot .tsub{font-size:12.5px}
+.tot .tsm{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:10px;padding-top:8px;border-top:1px dashed var(--line);font-size:12.5px;color:var(--mut)}.tot .tsm b{color:var(--ink);font-size:13.5px;margin-left:3px}
+@media(max-width:700px){.hgrid{grid-template-columns:1fr}.tot .big{font-size:38px}}
 .dlb{border:0;background:var(--blue);color:#fff;border-radius:22px;padding:11px 22px;font:inherit;font-weight:600;cursor:pointer}.dlb:active{transform:scale(.97)}
 </style></head><body>
 <header><h1><span class="lg">📞</span> Calls Tracker</h1><p class="tag">Regional languages first · Hindi · every team</p><p id="hsub"></p></header>
@@ -277,7 +282,9 @@ function dailyChart(){const c=D.co,x=MONTH.slice(0,N),all=c.alld,AL=c.alll,tot=a
  drawC()}
 function overview(){const c=D.co,R=c.regt,ks=REGL.slice().sort((a,b)=>pctLeft(c.reg[b],R[b])-pctLeft(c.reg[a],R[a]));
  const tot=ks.reduce((p,l)=>p+R[l],0),dn_=ks.reduce((p,l)=>p+Math.min(c.reg[l],R[l]),0);
- let h=`<div class="card hero" style="border-left:5px solid var(--org)">${ring(dn_/tot)}<div class="txt"><small>🎯 Main focus · Regional languages</small><div class="big">${f(tot-dn_)}</div><small>regional calls still to go · ${f(dn_)} done of ${f(tot)} (${pc(dn_/tot)})</small><div class="hchips">${ks.slice().sort((a,b)=>c.reg[b]/R[b]-c.reg[a]/R[a]).slice(0,3).map(l=>`<span>${l} ${pc(c.reg[l]/R[l])}</span>`).join('')}<em>closest to target</em></div></div></div>
+ const AL=c.alll,sm=x=>x.reduce((p,v)=>p+v,0),hin=sm(AL.Hindi||[]),all=sm(c.alld),oth=all-hin;
+ let h=`<div class="hgrid"><div class="card hero" style="border-left:5px solid var(--org)">${ring(dn_/tot)}<div class="txt"><small>🎯 Main focus · Regional languages</small><div class="big">${f(tot-dn_)}</div><small>regional calls still to go · ${f(dn_)} done of ${f(tot)} (${pc(dn_/tot)})</small><div class="hchips">${ks.slice().sort((a,b)=>c.reg[b]/R[b]-c.reg[a]/R[a]).slice(0,3).map(l=>`<span>${l} ${pc(c.reg[l]/R[l])}</span>`).join('')}<em>closest to target</em></div></div></div>
+ <div class="card tot"><small>📞 Total calls till date · all languages</small><div class="big">${f(all)}</div><small class="tsub">${D.days[N-1]} · ${f(c.alld[c.alld.length-1])} calls on the last day</small><div class="tsm"><span>Hindi <b>${f(hin)}</b></span><span>Other languages <b>${f(oth)}</b></span></div></div></div>
 <div class="card dcard" style="margin-top:12px"><h2>📈 Daily calls · all languages</h2><p class="sub">Bars show every call per day. Tap a language below to add its own daily line to the same chart.</p><div class="lchips" id="dcl"></div><div id="dcc"></div><div class="dsum" id="dcs"></div></div>
   <div class="card" style="margin-top:12px"><h2>Regional languages</h2><p class="sub">Tap a language for its daily chart and team split.</p><div class="seg" id="rgs"><button data-k="far">Furthest</button><button data-k="near">Closest</button><button data-k="most">Most calls</button></div><div class="grid g4" id="rg" style="margin-top:10px"></div></div>`;
  h+=othCard(c.oth,'Bhojpuri and Haryanvi are not part of the Hindi count.');
