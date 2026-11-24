@@ -281,10 +281,10 @@ function dailyChart(){const c=D.co,x=MONTH.slice(0,N),all=c.alld,AL=c.alll,tot=a
  chips.onclick=e=>{const b=e.target.closest('button');if(!b)return;const l=b.dataset.l;if(!l)DCSEL.clear();else DCSEL.has(l)?DCSEL.delete(l):DCSEL.add(l);drawC()};
  drawC()}
 const hrs=n=>(n/12).toLocaleString('en-IN',{minimumFractionDigits:1,maximumFractionDigits:1});
-function overview(){const c=D.co,ks=REGL.slice().sort((a,b)=>c.reg[b]-c.reg[a]);
- const dn_=ks.reduce((p,l)=>p+c.reg[l],0);
+function overview(){const c=D.co,NH=Object.entries(c.alll).filter(e=>e[0]!='Hindi').map(e=>[e[0],e[1].reduce((p,v)=>p+v,0)]).sort((a,b)=>b[1]-a[1]);
+ const dn_=NH.reduce((p,e)=>p+e[1],0);
  const AL=c.alll,sm=x=>x.reduce((p,v)=>p+v,0),hin=sm(AL.Hindi||[]),all=sm(c.alld),oth=all-hin;
- let h=`<div class="hgrid"><div class="card hero" style="border-left:5px solid var(--org)"><div class="txt"><small>🎯 Main focus · Regional languages</small><div class="big">${f(dn_)}</div><small>regional calls done till date</small><div class="hchips">${ks.slice(0,3).map(l=>`<span>${l} ${f(c.reg[l])}</span>`).join('')}<em>top languages</em></div></div></div>
+ let h=`<div class="hgrid"><div class="card hero" style="border-left:5px solid var(--org)"><div class="txt"><small>🎯 Main focus · Regional languages</small><div class="big">${f(dn_)}</div><small>calls in all languages except Hindi, till date</small><div class="hchips">${NH.slice(0,3).map(e=>`<span>${e[0]} ${f(e[1])}</span>`).join('')}<em>top languages</em></div></div></div>
  <div class="card tot"><small>📞 Total calls till date · all languages</small><div class="big">${f(all)}</div><small class="tsub">${D.days[N-1]} · ${f(c.alld[c.alld.length-1])} calls on the last day</small><div class="tsm"><span>Hindi <b>${f(hin)}</b> <em>(${hrs(hin)} Hours)</em></span><span>Other languages <b>${f(oth)}</b> <em>(${hrs(oth)} Hours)</em></span></div></div></div>
 <div class="card dcard" style="margin-top:12px"><h2>📈 Daily calls · all languages</h2><p class="sub">Bars show every call per day. Tap a language below to add its own daily line to the same chart.</p><div class="lchips" id="dcl"></div><div id="dcc"></div><div class="dsum" id="dcs"></div></div>
   <div class="card" style="margin-top:12px"><h2>Regional languages</h2><p class="sub">Tap a language for its daily chart and team split.</p><div class="grid g4" id="rg" style="margin-top:10px"></div></div>`;
