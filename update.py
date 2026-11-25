@@ -101,10 +101,10 @@ for T in TARGETS:
     dm=c[(c[days[:-3]].sum(axis=1)>=15)&(c[days[-3:]].sum(axis=1)==0)]
     r['dormant']=[dict(code=k,calls=int(dm.loc[k].sum()),last=lab[int(np.nonzero(dm.loc[k].values)[0][-1])]) for k in dm.sum(axis=1).sort_values(ascending=False).index[:10]]
     LR=[]
-    for l in SCOPE[T]:
+    for l in sorted(set(SCOPE[T])|{x for x in REG if (S.Language==x).any()},key=lambda x:-int((S.Language==x).sum())):
         own=int((S.Language==l).sum()); comp=int((d.Language==l).sum())
-        tg=TELSPLIT[T] if l=='Telugu' else REGT[l]; done=own if l=='Telugu' else comp
-        src=S if l=='Telugu' else d
+        tg=TELSPLIT[T] if (l=='Telugu' and T in TELSPLIT) else REGT[l]; done=own  # this team's own calls only
+        src=S
         dl=src[src.Language==l].groupby('date').size().reindex(days,fill_value=0).values.tolist()
         LR.append(dict(lang=l,target=tg,done=done,own=own,comp=comp,perday=max(tg-done,0)/REM,daily=dl))
     r['langs']=LR
