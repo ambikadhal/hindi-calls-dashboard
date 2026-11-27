@@ -267,16 +267,15 @@ function codeTable(host,rows,o){
  mq.addEventListener('change',draw);draw();fxBars(host);
 }
 /* ---------- pages ---------- */
-let DCSEL=new Set();
-function dailyChart(){const c=D.co,x=MONTH.slice(0,N),all=c.alld,AL=c.alll,tot=a=>a.reduce((p,v)=>p+v,0);
+function dailyChart(c,bc){c=c||D.co;bc=bc||'#6d4aff';const DCSEL=new Set(),x=MONTH.slice(0,N),all=c.alld,AL=c.alll,tot=a=>a.reduce((p,v)=>p+v,0);
  const langs=Object.keys(AL).sort((a,b)=>tot(AL[b])-tot(AL[a]));
  const chips=document.getElementById('dcl');
  const drawC=()=>{const sel=[...DCSEL];
-  chips.innerHTML=`<button class="${sel.length?'':'on'}" data-l="" style="--lc:#6d4aff">All languages</button>`+langs.map(l=>`<button class="${DCSEL.has(l)?'on':''}" data-l="${l}" style="--lc:${lc(l)}"><i></i>${l}<em>${f(tot(AL[l]))}</em></button>`).join('');
-  const bars=sel.length?[]:[{n:'All languages',c:'#6d4aff',v:all}];
+  chips.innerHTML=`<button class="${sel.length?'':'on'}" data-l="" style="--lc:${bc}">All languages</button>`+langs.map(l=>`<button class="${DCSEL.has(l)?'on':''}" data-l="${l}" style="--lc:${lc(l)}"><i></i>${l}<em>${f(tot(AL[l]))}</em></button>`).join('');
+  const bars=sel.length?[]:[{n:'All languages',c:bc,v:all}];
   const lines=sel.map(l=>({n:l,c:lc(l),w:2.8,v:AL[l],dots:1}));
   mkChart(document.getElementById('dcc'),{x,tl:tlab,h:260,shade:D.dnum.map((n,i)=>isSun(n)?i:-1).filter(i=>i>=0),bars,lines});
-  const rows=sel.length?sel.map(l=>[l,AL[l],lc(l)]):[['All languages',all,'#6d4aff']];
+  const rows=sel.length?sel.map(l=>[l,AL[l],lc(l)]):[['All languages',all,bc]];
   document.getElementById('dcs').innerHTML=rows.map(([n,a,col])=>{const t=tot(a),pk=Math.max(...a);return `<div style="--lc:${col}"><b>${n}</b><span>${f(t)} total</span><span>${f(Math.round(t/a.length))}/day avg</span><span>best ${f(pk)} on ${tlab(a.lastIndexOf(pk))}</span><span>last day ${f(a[a.length-1])}</span></div>`}).join('')};
  chips.onclick=e=>{const b=e.target.closest('button');if(!b)return;const l=b.dataset.l;if(!l)DCSEL.clear();else DCSEL.has(l)?DCSEL.delete(l):DCSEL.add(l);drawC()};
  drawC()}
@@ -303,7 +302,7 @@ function mount_overview(){const c=D.co;
  mount('o-t',{x:MONTH.slice(0,N),tl:tlab,h:240,lines:TK.map(t=>({n:D.teams[t].name,c:COL[t],v:D.teams[t].hd,dots:1}))});
  mount('o-c',{x:MONTH,tl:tlab,h:240,lines:[{n:'Done so far',c:'#6d4aff',w:3,v:pad(c.cumact,0)}]})}
 function team(T){const r=D.teams[T],col=COL[T],tips=teamTips(T);
- let h=`<div class="card" style="border-left:5px solid var(--org)"><h2>🎯 Regional languages · ${r.name}</h2><p class="sub">Tap a language to see its day-by-day counts. Counts are this team's own calls in that language.</p><div class="grid g3 langs" style="margin-top:8px">${r.langs.map((x,i)=>langTile(x.lang,x.done,0,`data-i="${i}"`)).join('')}</div></div>`;
+ let h=`<div class="card dcard" style="margin-bottom:12px"><h2>📈 Daily calls · all languages · ${r.name}</h2><p class="sub">Bars show every call per day. Tap a language below to add its own daily line to the same chart.</p><div class="lchips" id="dcl"></div><div id="dcc"></div><div class="dsum" id="dcs"></div></div><div class="card" style="border-left:5px solid var(--org)"><h2>🎯 Regional languages · ${r.name}</h2><p class="sub">Tap a language to see its day-by-day counts. Counts are this team's own calls in that language.</p><div class="grid g3 langs" style="margin-top:8px">${r.langs.map((x,i)=>langTile(x.lang,x.done,0,`data-i="${i}"`)).join('')}</div></div>`;
  h+=othCard(r.oth,'');
  h+=hindiCard(r,r.name);
  h+=`<div class="card" style="margin-top:12px"><h2>💡 Tips to increase regional calls</h2><p class="sub">Based on this team's own codes</p><div class="acts" style="margin-top:8px">${tips.map((a,i)=>`<div class="act"><div class="n">${i+1}</div><div><b>${a[0]} ${a[1]}</b><span>${a[2]}</span></div></div>`).join('')}</div></div>
@@ -313,6 +312,7 @@ function team(T){const r=D.teams[T],col=COL[T],tips=teamTips(T);
  <div class="grid g2" style="margin-top:12px"><div class="card"><h2>⏰ When calls happen</h2><p class="sub">Average Hindi calls in each hour of the day.</p><div id="th"></div></div><div class="card"><h2>Day × hour map</h2><p class="sub">Darker = more calls. Hover for numbers.</p><div class="heat" id="hm"></div></div></div>`;
  return h}
 function mount_team(T){const r=D.teams[T],col=COL[T];
+ dailyChart(r,col);
  mount('t-r',{x:MONTH.slice(0,N),tl:tlab,shade:MONTH.slice(0,N).map((n,i)=>isSun(n)?i:-1).filter(i=>i>=0),h:210,bars:[{n:'Regional calls',c:col,v:r.regd}]});
  mount('t-c',{x:MONTH,tl:tlab,h:210,lines:[{n:'Done so far',c:col,w:3,v:pad(r.cumact,0)}]});
  codeTable(document.getElementById('ct'),codeRows(T),{});

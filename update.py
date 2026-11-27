@@ -109,6 +109,8 @@ for T in TARGETS:
         LR.append(dict(lang=l,target=tg,done=done,own=own,comp=comp,perday=max(tg-done,0)/REM,daily=dl))
     r['langs']=LR
     r['oth']={l:int(n) for l,n in S[~S.Language.isin(REG+['Hindi'])].Language.value_counts().items()}
+    r['alld']=S.groupby('date').size().reindex(days,fill_value=0).tolist()
+    r['alll']={l:S[S.Language==l].groupby('date').size().reindex(days,fill_value=0).tolist() for l in S.Language.dropna().unique()}
     r['regd']=S[S.Language.isin(REG)].groupby('date').size().reindex(days,fill_value=0).tolist()
     h=H.groupby(['date','hour']).size().unstack(fill_value=0).reindex(index=days,columns=range(24),fill_value=0)
     r['heat']=h.values.tolist(); r['hourAvg']=h.loc[days[1:]].mean().round(1).tolist()
